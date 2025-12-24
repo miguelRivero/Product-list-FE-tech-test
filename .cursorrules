@@ -1,0 +1,91 @@
+# Vivara Products App - Cursor AI Rules
+
+## Project Context
+
+- Framework: Vue 3 Composition API + TypeScript
+- Build: Vite
+- UI: PrimeVue + Tailwind CSS
+- State: Pinia
+- Testing: Vitest (unit) + Playwright (E2E)
+- API: DummyJSON (does NOT persist writes)
+
+## File Organization
+
+- **Unit tests**: Co-locate with source (ProductList.spec.ts next to ProductList.vue)
+- **E2E tests**: Keep in tests/e2e/ (full user flows)
+- **Components**: Group by feature (products/, common/)
+- **Types**: Define in src/types/
+- **Services**: API calls in src/services/
+- **Stores**: Pinia stores in src/stores/
+- **Composables**: Reusable logic in src/composables/
+
+## Code Style Rules
+
+### Vue 3 Components
+
+- ALWAYS use `<script setup lang="ts">`
+- Use Composition API (ref, computed, watch)
+- Structure: script → template → style
+- Extract complex logic into composables
+- Keep components under 200 lines
+
+### Testing
+
+- Unit tests: \*.spec.ts next to source file
+- Test composables, services, stores
+- Test component behavior (not markup)
+- Use data-testid for E2E selectors
+- Aim for 80%+ coverage on critical paths
+
+### TypeScript
+
+- Use strict mode
+- Define interfaces in src/types/
+- Avoid any (use unknown if needed)
+- Type all function parameters and returns
+
+### Naming
+
+- Components: PascalCase (ProductList.vue)
+- Composables: camelCase with "use" prefix (useProducts.ts)
+- Types: PascalCase (Product, ApiResponse)
+- Test files: \*.spec.ts
+
+### API & State
+
+- All API calls through src/services/api.ts
+- Use Pinia for global state (products, categories)
+- Simulate CRUD locally (DummyJSON doesn't persist)
+- Optimistic updates with rollback on error
+
+### Styling
+
+- Use Tailwind utility classes
+- Minimal custom SCSS in <style scoped>
+- Use PrimeVue components (DataTable, Dialog, etc.)
+- Responsive design (mobile-first)
+
+### Accessibility
+
+- Semantic HTML
+- aria-labels on icon buttons
+- Keyboard navigation support
+- WCAG AA contrast ratios
+
+## When Generating Code
+
+1. Define TypeScript interfaces first
+2. Create service functions for API
+3. Build composable for logic
+4. Create component using composable
+5. Add co-located test file
+6. Document trade-offs if needed
+
+## Forbidden
+
+- ❌ Options API (use Composition only)
+- ❌ Inline styles (use Tailwind)
+- ❌ console.log in production
+- ❌ Hardcoded URLs (use env vars)
+- ❌ any type without justification
+- ❌ Untested critical paths
