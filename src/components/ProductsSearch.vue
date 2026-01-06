@@ -1,6 +1,6 @@
 <template>
-  <div class="mb-6">
-    <div class="relative w-full max-w-md">
+  <div class="mb-6 py-1 shadow">
+    <div class="relative w-full">
       <i
         class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 z-10 w-5 h-5 text-[#6b7280]"
       />

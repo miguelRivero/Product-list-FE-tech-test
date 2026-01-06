@@ -1,5 +1,10 @@
+import type {
+  Category,
+  Product,
+  ProductFormData,
+  ProductsResponse,
+} from "@/types/product";
 import axios, { AxiosError, AxiosInstance } from "axios";
-import type { Product, ProductsResponse, ProductFormData } from "@/types/product";
 
 // API base URL - supports BFF pattern via environment variable
 // Defaults to DummyJSON for current implementation
@@ -53,10 +58,7 @@ export const productsApi = {
    * @param skip - Number of products to skip (default: 0)
    * @returns ProductsResponse with products array and pagination info
    */
-  getProducts: async (
-    limit = 10,
-    skip = 0
-  ): Promise<ProductsResponse> => {
+  getProducts: async (limit = 10, skip = 0): Promise<ProductsResponse> => {
     const { data } = await api.get<ProductsResponse>(
       `/products?limit=${limit}&skip=${skip}`
     );
@@ -86,34 +88,36 @@ export const productsApi = {
     skip = 0
   ): Promise<ProductsResponse> => {
     const { data } = await api.get<ProductsResponse>(
-      `/products/search?q=${encodeURIComponent(query)}&limit=${limit}&skip=${skip}`
+      `/products/search?q=${encodeURIComponent(
+        query
+      )}&limit=${limit}&skip=${skip}`
     );
     return data;
   },
 
   /**
    * Get all categories
-   * @returns Array of category strings
+   * @returns Array of category objects with slug, name, and url
    */
-  getCategories: async (): Promise<string[]> => {
-    const { data } = await api.get<string[]>("/products/categories");
+  getCategories: async (): Promise<Category[]> => {
+    const { data } = await api.get<Category[]>("/products/categories");
     return data;
   },
 
   /**
    * Get products by category
-   * @param category - Category name
+   * @param categorySlug - Category slug
    * @param limit - Number of products per page (default: 10)
    * @param skip - Number of products to skip (default: 0)
    * @returns ProductsResponse with filtered products
    */
   getProductsByCategory: async (
-    category: string,
+    categorySlug: string,
     limit = 10,
     skip = 0
   ): Promise<ProductsResponse> => {
     const { data } = await api.get<ProductsResponse>(
-      `/products/category/${encodeURIComponent(category)}?limit=${limit}&skip=${skip}`
+      `/products/category/${categorySlug}?limit=${limit}&skip=${skip}`
     );
     return data;
   },
@@ -124,9 +128,7 @@ export const productsApi = {
    * @param productData - Product form data
    * @returns Created product (fake response from DummyJSON)
    */
-  createProduct: async (
-    productData: ProductFormData
-  ): Promise<Product> => {
+  createProduct: async (productData: ProductFormData): Promise<Product> => {
     const { data } = await api.post<Product>("/products/add", productData);
     return data;
   },
@@ -159,4 +161,3 @@ export const productsApi = {
 };
 
 export default api;
-

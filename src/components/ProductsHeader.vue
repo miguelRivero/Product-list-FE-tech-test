@@ -1,5 +1,5 @@
 <template>
-  <header class="products-header">
+  <header class="products-header shadow">
     <!-- Logo and App Info Section -->
     <div
       class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center gap-4"
@@ -33,7 +33,6 @@
 <style scoped lang="scss">
 .products-header {
   background-color: $background; // #f7f7f7
-  border-bottom: 1px solid $border-gray; // #e2e2e2
 }
 
 .header-title {

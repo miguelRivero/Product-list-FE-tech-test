@@ -1,6 +1,12 @@
+import type {
+  Category,
+  Product,
+  ProductFormData,
+  ProductsResponse,
+} from "@/types/product";
+import { computed, ref } from "vue";
+
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import type { Product, ProductFormData, ProductsResponse } from "@/types/product";
 import { productsApi } from "@/services/api";
 
 export const useProductsStore = defineStore("products", () => {
@@ -10,11 +16,11 @@ export const useProductsStore = defineStore("products", () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const selectedProduct = ref<Product | null>(null);
-  const categories = ref<string[]>([]);
+  const categories = ref<Category[]>([]);
+  const selectedCategory = ref<string | null>(null);
   const currentPage = ref(1);
   const pageSize = ref(10);
   const searchQuery = ref("");
-  const selectedCategory = ref<string | null>(null);
 
   // Getters
   const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
@@ -59,7 +65,8 @@ export const useProductsStore = defineStore("products", () => {
       products.value = response.products;
       total.value = response.total;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch products";
+      error.value =
+        err instanceof Error ? err.message : "Failed to fetch products";
       console.error("Error fetching products:", err);
     } finally {
       loading.value = false;
@@ -76,7 +83,8 @@ export const useProductsStore = defineStore("products", () => {
     try {
       selectedProduct.value = await productsApi.getProduct(id);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch product";
+      error.value =
+        err instanceof Error ? err.message : "Failed to fetch product";
       console.error("Error fetching product:", err);
     } finally {
       loading.value = false;
@@ -140,7 +148,8 @@ export const useProductsStore = defineStore("products", () => {
 
       return newProduct;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to create product";
+      error.value =
+        err instanceof Error ? err.message : "Failed to create product";
       console.error("Error creating product:", err);
       throw err;
     }
@@ -189,7 +198,8 @@ export const useProductsStore = defineStore("products", () => {
       if (selectedProduct.value?.id === id) {
         selectedProduct.value = originalProduct;
       }
-      error.value = err instanceof Error ? err.message : "Failed to update product";
+      error.value =
+        err instanceof Error ? err.message : "Failed to update product";
       console.error("Error updating product:", err);
       throw err;
     }
@@ -227,7 +237,8 @@ export const useProductsStore = defineStore("products", () => {
         products.value.splice(productIndex, 0, backup);
         total.value += 1;
       }
-      error.value = err instanceof Error ? err.message : "Failed to delete product";
+      error.value =
+        err instanceof Error ? err.message : "Failed to delete product";
       console.error("Error deleting product:", err);
       throw err;
     }
@@ -283,4 +294,3 @@ export const useProductsStore = defineStore("products", () => {
     reset,
   };
 });
-
