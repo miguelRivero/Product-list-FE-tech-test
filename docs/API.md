@@ -590,10 +590,241 @@ async function getCachedProducts(limit: number, skip: number) {
 
 ---
 
+## Backend for Frontend (BFF) Approach
+
+### Current Limitation with Direct API Calls
+
+The current implementation calls DummyJSON directly from the frontend, which works well for development and this technical assessment. However, this approach has limitations that a BFF layer would address:
+
+1. **No Persistence**: DummyJSON doesn't persist writes, requiring complex frontend workarounds
+2. **Rate Limiting**: Frontend is directly affected by DummyJSON rate limits (~100 req/min)
+3. **Data Structure**: Frontend must adapt to DummyJSON's response format
+4. **Caching**: No server-side caching, every request hits DummyJSON
+5. **Error Handling**: Limited retry and error recovery options
+
+### How BFF Would Solve These Issues
+
+**1. Persistence Layer**
+
+```typescript
+// BFF would handle real persistence
+POST /api/products
+→ BFF validates data
+→ BFF saves to database
+→ BFF returns success
+→ Frontend receives real persisted data
+```
+
+**2. Rate Limiting & Caching**
+
+```typescript
+// BFF implements intelligent caching
+GET /api/products?page=1
+→ Check Redis cache
+→ If cached and fresh, return immediately
+→ If not cached, fetch from DummyJSON/database
+→ Cache response for 5 minutes
+→ Return to frontend
+```
+
+**3. Data Transformation**
+
+```typescript
+// BFF transforms DummyJSON response to frontend-friendly format
+DummyJSON Response:
+{
+  products: [...],
+  total: 194,
+  skip: 0,
+  limit: 10
+}
+
+BFF Transformed Response:
+{
+  data: [...],
+  pagination: {
+    currentPage: 1,
+    totalPages: 20,
+    pageSize: 10,
+    totalItems: 194,
+    hasNext: true,
+    hasPrev: false
+  }
+}
+```
+
+**4. Error Handling**
+
+```typescript
+// BFF handles errors gracefully
+try {
+  const data = await fetchFromDummyJSON();
+  return transformResponse(data);
+} catch (error) {
+  // Retry logic
+  if (error.status === 429) {
+    await waitAndRetry();
+  }
+  // Circuit breaker
+  if (errorCount > threshold) {
+    return cachedFallback();
+  }
+  throw userFriendlyError(error);
+}
+```
+
+### BFF Endpoint Design
+
+**Recommended BFF API Structure:**
+
+```typescript
+// Products
+GET    /api/products              // List with pagination
+GET    /api/products/:id          // Single product
+POST   /api/products              // Create (with real persistence)
+PUT    /api/products/:id          // Update (with real persistence)
+DELETE /api/products/:id          // Delete (with real persistence)
+
+// Categories
+GET    /api/categories            // List all categories
+GET    /api/categories/:name      // Products in category
+
+// Search
+GET    /api/search?q=query        // Search products
+```
+
+### BFF Implementation Example
+
+**Basic BFF Structure (Node.js + Express):**
+
+```typescript
+// bff/src/routes/products.ts
+import express from "express";
+import { productsService } from "../services/products";
+import { cache } from "../middleware/cache";
+
+const router = express.Router();
+
+// GET /api/products
+router.get("/", cache("5m"), async (req, res) => {
+  const { page = 1, limit = 10, category } = req.query;
+
+  try {
+    // Fetch from DummyJSON or database
+    const data = await productsService.getProducts({
+      page: Number(page),
+      limit: Number(limit),
+      category: category as string,
+    });
+
+    // Transform to frontend-friendly format
+    const response = {
+      data: data.products,
+      pagination: {
+        currentPage: Number(page),
+        totalPages: Math.ceil(data.total / Number(limit)),
+        pageSize: Number(limit),
+        totalItems: data.total,
+        hasNext: Number(page) < Math.ceil(data.total / Number(limit)),
+        hasPrev: Number(page) > 1,
+      },
+    };
+
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+});
+
+// POST /api/products (with real persistence)
+router.post("/", async (req, res) => {
+  try {
+    // Validate input
+    const validated = validateProductData(req.body);
+
+    // Save to database (not DummyJSON)
+    const product = await productsService.createProduct(validated);
+
+    // Invalidate cache
+    cache.invalidate("/api/products");
+
+    res.status(201).json({ data: product });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+```
+
+### Frontend Service Layer Update
+
+**Current (Direct API):**
+
+```typescript
+// src/services/api.ts
+const api = axios.create({
+  baseURL: "https://dummyjson.com",
+});
+```
+
+**With BFF:**
+
+```typescript
+// src/services/api.ts
+const api = axios.create({
+  baseURL: import.meta.env.VITE_BFF_URL || "http://localhost:3000/api",
+});
+
+// Same interface, different backend
+export const productsApi = {
+  getProducts: async (page = 1, limit = 10) => {
+    const { data } = await api.get(`/products?page=${page}&limit=${limit}`);
+    return data; // Already transformed by BFF
+  },
+};
+```
+
+### Benefits Summary
+
+| Feature            | Without BFF         | With BFF                |
+| ------------------ | ------------------- | ----------------------- |
+| **Persistence**    | Frontend simulation | Real database           |
+| **Caching**        | None                | Server-side (Redis)     |
+| **Rate Limiting**  | Frontend affected   | Server-side queue       |
+| **Error Handling** | Basic               | Retry + Circuit breaker |
+| **Data Format**    | DummyJSON format    | Frontend-optimized      |
+| **Testing**        | Mock external API   | Mock BFF (simpler)      |
+
+### Migration Strategy
+
+**Phase 1: BFF Proxy (Non-Breaking)**
+
+- Deploy BFF that proxies to DummyJSON
+- Update frontend to call BFF
+- No functionality changes
+
+**Phase 2: Add Caching**
+
+- Implement Redis caching in BFF
+- Reduce DummyJSON calls
+- Improve performance
+
+**Phase 3: Add Persistence**
+
+- Replace DummyJSON with database
+- Remove optimistic update workarounds
+- Real CRUD operations
+
+**Phase 4: Enhance**
+
+- Add request aggregation
+- Advanced features
+- Monitoring and analytics
+
+---
+
 ## API Changes / Future Considerations
 
-- DummyJSON may add authentication in future (JWT tokens)
-- Consider migrating to real backend for production
+- Consider migrating to real backend for production (see BFF Approach section above)
 - Image uploads would require separate service (Cloudinary, S3)
 - Search could be improved with Elasticsearch/Algolia
 

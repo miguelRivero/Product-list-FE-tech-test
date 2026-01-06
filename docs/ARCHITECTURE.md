@@ -67,6 +67,264 @@
          └────────────────────┘
 ```
 
+## Backend for Frontend (BFF) Architecture
+
+### Overview
+
+The current implementation calls DummyJSON API directly from the frontend, which works well for this technical assessment. However, in a production environment, a **Backend for Frontend (BFF)** pattern would provide significant architectural benefits. This section documents how BFF would integrate into our architecture as a future enhancement.
+
+### What is BFF?
+
+BFF is an architectural pattern where a dedicated backend service sits between the frontend and external APIs. It's tailored specifically to the needs of the frontend application, aggregating data, transforming responses, and handling cross-cutting concerns like caching and error handling.
+
+### Why BFF for This Application?
+
+**Current Architecture (Technical Test):**
+
+- Direct API calls to DummyJSON from frontend
+- Frontend handles all data transformation
+- No persistence layer (simulated in Pinia store)
+- Rate limiting affects frontend directly
+- No server-side caching
+
+**BFF Benefits (Production):**
+
+- **Data Aggregation**: Combine multiple API calls into single requests
+- **Data Transformation**: Shape responses to match frontend needs exactly
+- **Persistence Layer**: Handle CRUD operations properly (replace DummyJSON limitations)
+- **Caching**: Server-side caching reduces API calls and improves performance
+- **Error Handling**: Centralized error handling and retry logic
+- **Rate Limiting**: Manage rate limits server-side with queuing/backoff
+
+### Updated Data Flow with BFF
+
+```
+┌─────────────────────────────────────────┐
+│           DummyJSON API                 │
+│  (or Real Backend in Production)        │
+└─────────────────────────────────────────┘
+                   ▲
+                   │
+         ┌─────────▼──────────┐
+         │   BFF Layer        │
+         │  (Node.js/Express) │
+         │  - Aggregation     │
+         │  - Transformation  │
+         │  - Caching         │
+         │  - Persistence     │
+         └─────────┬──────────┘
+                   │
+         ┌─────────▼──────────┐
+         │   API Service      │
+         │  (src/services/)   │
+         │  Calls BFF API     │
+         └─────────┬──────────┘
+                   │
+         ┌─────────▼──────────┐
+         │   Pinia Store      │
+         │  (products store)  │
+         │  - Handles CRUD    │
+         │  - No optimistic   │
+         │    workarounds     │
+         └─────────┬──────────┘
+                   │
+         ┌─────────▼──────────┐
+         │   Composables      │
+         │  (useProducts)     │
+         └─────────┬──────────┘
+                   │
+         ┌─────────▼──────────┐
+         │    Components      │
+         │  (ProductList.vue) │
+         └────────────────────┘
+```
+
+### BFF Implementation Strategy
+
+**Phase 1: Basic BFF (Proxy Layer)**
+
+- BFF proxies requests to DummyJSON
+- Transforms responses to frontend-friendly format
+- Adds basic error handling
+- No breaking changes to frontend
+
+**Phase 2: Enhanced BFF (Caching & Persistence)**
+
+- Implement Redis caching layer
+- Replace DummyJSON with database (PostgreSQL/MongoDB)
+- Remove optimistic update workarounds from frontend
+- Real CRUD operations
+
+**Phase 3: Production Ready**
+
+- Request queuing for rate limits
+- Advanced error handling (retry, circuit breaker)
+- Monitoring and logging
+- Performance optimization
+
+### BFF Endpoint Design
+
+**Recommended BFF API Structure:**
+
+```typescript
+// Products
+GET    /api/products              // List with pagination
+GET    /api/products/:id          // Single product
+POST   /api/products              // Create (with real persistence)
+PUT    /api/products/:id          // Update (with real persistence)
+DELETE /api/products/:id          // Delete (with real persistence)
+
+// Categories
+GET    /api/categories            // List all categories
+GET    /api/categories/:name      // Products in category
+
+// Search
+GET    /api/search?q=query        // Search products
+
+// Aggregated Endpoints (Future)
+GET    /api/dashboard             // Products + Categories + Stats
+```
+
+**Frontend-Friendly Response Format:**
+
+```typescript
+// Current DummyJSON Response
+{
+  products: [...],
+  total: 194,
+  skip: 0,
+  limit: 10
+}
+
+// BFF Transformed Response
+{
+  data: [...],
+  pagination: {
+    currentPage: 1,
+    totalPages: 20,
+    pageSize: 10,
+    totalItems: 194,
+    hasNext: true,
+    hasPrev: false
+  }
+}
+```
+
+### BFF Responsibilities
+
+1. **Data Persistence**
+
+   - Replace DummyJSON with real database
+   - Handle CRUD operations properly
+   - No more optimistic update workarounds needed
+
+2. **Request Aggregation**
+
+   ```typescript
+   // Instead of multiple frontend calls:
+   // GET /products
+   // GET /categories
+
+   // Single BFF call:
+   // GET /api/dashboard
+   // Returns: { products, categories }
+   ```
+
+3. **Caching Strategy**
+
+   ```typescript
+   // BFF can cache:
+   // - Product lists (5 min TTL)
+   // - Categories (1 hour TTL)
+   // - Search results (1 min TTL)
+   // - Individual products (10 min TTL)
+   ```
+
+4. **Error Handling**
+
+   - Retry logic with exponential backoff
+   - Circuit breaker pattern
+   - Graceful degradation
+   - User-friendly error messages
+
+5. **Rate Limiting**
+   - Server-side rate limit management
+   - Request queuing
+   - Backoff strategies
+
+### Migration Path
+
+**Step 1: Add BFF Proxy (Non-Breaking)**
+
+- Deploy BFF that proxies requests to DummyJSON
+- Frontend calls BFF instead of DummyJSON directly
+- No frontend code changes needed (just update base URL)
+
+**Step 2: Add Caching**
+
+- Implement Redis caching in BFF
+- Reduce DummyJSON API calls
+- Improve response times
+
+**Step 3: Add Persistence**
+
+- Replace DummyJSON with database
+- Implement real CRUD operations
+- Remove optimistic update workarounds from frontend
+
+**Step 4: Enhance Features**
+
+- Add request aggregation
+- Implement advanced search
+- Add analytics and monitoring
+
+### Trade-offs
+
+**Pros:**
+
+- ✅ Better separation of concerns
+- ✅ Improved performance (caching, aggregation)
+- ✅ Easier to test (mock BFF instead of external API)
+- ✅ Production-ready architecture
+- ✅ Real persistence (no workarounds)
+
+**Cons:**
+
+- ❌ Additional infrastructure to maintain
+- ❌ Increased complexity
+- ❌ Additional deployment steps
+- ❌ Slight latency increase (minimal)
+
+### Current vs. BFF Comparison
+
+| Aspect             | Current (Direct API) | With BFF               |
+| ------------------ | -------------------- | ---------------------- |
+| **Persistence**    | Frontend simulation  | Real database          |
+| **Caching**        | None                 | Server-side (Redis)    |
+| **Rate Limiting**  | Frontend affected    | Server-side management |
+| **Error Handling** | Basic                | Centralized + Retry    |
+| **Data Format**    | DummyJSON format     | Frontend-optimized     |
+| **Testing**        | Mock external API    | Mock BFF (simpler)     |
+| **Complexity**     | Low                  | Medium                 |
+
+### Recommendation
+
+For the **technical test**, the current direct API approach is appropriate:
+
+- Simpler setup
+- Faster development
+- Meets all requirements
+- No additional infrastructure needed
+
+For **production**, implement BFF:
+
+- Better architecture
+- Scalability
+- Maintainability
+- Real persistence
+
+---
+
 ## State Management Strategy
 
 ### Local State (ref/reactive)

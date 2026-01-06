@@ -57,13 +57,44 @@
 - Use Pinia for global state (products, categories)
 - Simulate CRUD locally (DummyJSON doesn't persist)
 - Optimistic updates with rollback on error
+- **BFF Pattern**: Consider Backend for Frontend pattern for production (see ARCHITECTURE.md)
 
-### Styling
+### Styling Architecture
 
-- Use Tailwind utility classes
-- Minimal custom SCSS in <style scoped>
-- Use PrimeVue components (DataTable, Dialog, etc.)
-- Responsive design (mobile-first)
+#### Three-Layer Approach
+
+1. **Tailwind CSS** (style.css - PostCSS)
+
+   - Use for: Layout (flex, grid), spacing (p-_, m-_), responsive (md:, lg:)
+   - Global utilities, applied via class attributes
+   - DO NOT put @tailwind in .scss files
+
+2. **SCSS** (\*.vue <style lang="scss">)
+
+   - Use for: Variables, mixins, nesting, complex animations
+   - Custom component styles that need SCSS features
+   - Variables auto-imported via vite.config.ts
+
+3. **PrimeVue** (Components - Runtime)
+   - Use for: Complex UI components (DataTable, Dialog, Calendar)
+   - Pre-styled, interactive components
+   - Combine with Tailwind classes for width/spacing
+
+#### Rules
+
+✅ Tailwind classes in template: `<div class="flex gap-4">`
+✅ SCSS in style block: `<style scoped lang="scss">$var: value;</style>`
+✅ PrimeVue components: `<DataTable class="w-full" />`
+
+❌ Don't put @tailwind in .scss files (PostCSS directive, not SCSS)
+❌ Don't duplicate Tailwind utilities in SCSS
+❌ Don't override PrimeVue internal styles (use severity/props instead)
+
+#### File Structure
+
+- `src/style.css` - Tailwind imports (PostCSS)
+- `src/styles/_variables.scss` - SCSS variables (auto-imported)
+- `*.vue` files - Use `<style scoped lang="scss">` for custom styles
 
 ### Accessibility
 

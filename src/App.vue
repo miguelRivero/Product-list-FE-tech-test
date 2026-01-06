@@ -12,8 +12,13 @@
     <main class="mx-auto max-w-6xl px-4 py-4">
       <RouterView />
     </main>
+    <Toast />
   </div>
 </template>
+
+<script setup lang="ts">
+import Toast from "primevue/toast";
+</script>
 
 <style scoped>
 .logo {

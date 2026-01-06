@@ -17,6 +17,7 @@
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
     "@primevue/themes": "^4.5.4",
+    "@vueuse/core": "^11.0.0",
     "axios": "^1.7.4",
     "date-fns": "^4.1.0",
     "pinia": "^2.2.6",
