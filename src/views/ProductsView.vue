@@ -133,7 +133,6 @@ const confirmDelete = (product: Product) => {
 
 <style scoped lang="scss">
 .products-view {
-  padding: 1rem 0;
   min-height: calc(100vh - 200px);
 }
 </style>
