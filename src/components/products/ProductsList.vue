@@ -70,32 +70,13 @@
             </span>
           </td>
           <td class="product-actions-cell px-6 py-4 align-middle w-[150px]">
-            <div class="action-icons flex items-center gap-3">
-              <button
-                class="action-icon-button p-2 rounded transition-colors"
-                @click="$emit('view', product.id)"
-                data-testid="view-button"
-                aria-label="View product"
-              >
-                <i class="pi pi-eye action-icon w-5 h-5 text-[#6b7280]" />
-              </button>
-              <button
-                class="action-icon-button p-2 rounded transition-colors"
-                @click="$emit('edit', product.id)"
-                data-testid="edit-button"
-                aria-label="Edit product"
-              >
-                <i class="pi pi-pencil action-icon w-5 h-5 text-[#6b7280]" />
-              </button>
-              <button
-                class="action-icon-button action-icon-button-danger p-2 rounded transition-colors"
-                @click="$emit('delete', product)"
-                data-testid="delete-button"
-                aria-label="Delete product"
-              >
-                <i class="pi pi-trash action-icon w-5 h-5 text-[#ef4444]" />
-              </button>
-            </div>
+            <ProductListActions
+              :product-id="product.id"
+              :product="product"
+              @view="$emit('view', $event)"
+              @edit="$emit('edit', $event)"
+              @delete="$emit('delete', $event)"
+            />
           </td>
         </tr>
       </tbody>
@@ -105,6 +86,7 @@
 
 <script setup lang="ts">
 import type { Product } from "@/types/product";
+import ProductListActions from "./ProductListActions.vue";
 
 defineProps<{
   products: Product[];
@@ -171,17 +153,5 @@ const capitalizeCategory = (category: string): string => {
   height: 100%;
   object-fit: cover;
   object-position: center;
-}
-
-.action-icon-button {
-  &:hover {
-    background-color: $background;
-  }
-
-  &.action-icon-button-danger {
-    &:hover {
-      background-color: rgba($danger, 0.1);
-    }
-  }
 }
 </style>
