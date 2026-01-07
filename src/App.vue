@@ -1,5 +1,6 @@
 <template>
   <div class="app-container min-h-screen">
+    <Header />
     <main class="main-content max-w-7xl mx-auto">
       <RouterView />
     </main>
@@ -9,6 +10,7 @@
 
 <script setup lang="ts">
 import Toast from "primevue/toast";
+import Header from "@/components/Header.vue";
 </script>
 
 <style scoped lang="scss">

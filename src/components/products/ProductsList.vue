@@ -6,9 +6,9 @@
     >
       <thead>
         <tr class="table-header-row">
-          <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
-            Image
-          </th>
+          <th
+            class="px-6 py-4 text-left text-sm text-[#374151] font-normal"
+          ></th>
           <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
             Title
           </th>

@@ -1,7 +1,5 @@
 <template>
   <div class="products-view">
-    <ProductsHeader />
-
     <ProductsSearch v-model:searchQuery="searchQuery" />
 
     <ProductsToolbar
@@ -38,11 +36,10 @@ import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-import ProductsHeader from "@/components/ProductsHeader.vue";
-import ProductsSearch from "@/components/ProductsSearch.vue";
-import ProductsToolbar from "@/components/ProductsToolbar.vue";
-import ProductsContent from "@/components/ProductsContent.vue";
-import ProductsPagination from "@/components/ProductsPagination.vue";
+import ProductsSearch from "@/components/products/ProductsSearch.vue";
+import ProductsToolbar from "@/components/products/ProductsToolbar.vue";
+import ProductsContent from "@/components/products/ProductsContent.vue";
+import ProductsPagination from "@/components/products/ProductsPagination.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
 import { useProductsStore } from "@/stores/products";
