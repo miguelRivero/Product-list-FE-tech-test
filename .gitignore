@@ -16,7 +16,6 @@ dist-ssr/
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
@@ -47,6 +46,9 @@ test-results/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test requirements (PDFs and design files)
+test-requirements/
 
 # Cursor AI / IDE Configuration
 .cursor/
