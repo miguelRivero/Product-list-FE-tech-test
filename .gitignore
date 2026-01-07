@@ -56,3 +56,4 @@ test-requirements/
 .cursor/context.md
 .cursor/**
 *.cursor-*
+docs/
