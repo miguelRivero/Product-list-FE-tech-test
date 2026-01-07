@@ -33,13 +33,15 @@
           class="product-row transition-colors"
           data-testid="product-row"
         >
-          <td class="product-image-cell px-6 py-4 align-middle w-20">
-            <img
-              :src="product.thumbnail"
-              :alt="product.title"
-              class="product-image w-16 h-16 aspect-square rounded-md object-cover"
-              @error="handleImageError"
-            />
+          <td class="product-image-cell px-6 py-4 align-middle">
+            <div class="product-image-wrapper w-16 h-16 flex-shrink-0">
+              <img
+                :src="product.thumbnail"
+                :alt="product.title"
+                class="product-image w-full h-full rounded-md object-cover"
+                @error="handleImageError"
+              />
+            </div>
           </td>
           <td class="product-title-cell px-6 py-4 align-middle min-w-[200px]">
             <span
@@ -156,8 +158,19 @@ const capitalizeCategory = (category: string): string => {
   }
 }
 
+.product-image-wrapper {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 0.375rem;
+}
+
 .product-image {
   background-color: $skeleton;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .action-icon-button {
