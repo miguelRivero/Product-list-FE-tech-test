@@ -21,27 +21,29 @@
     <!-- Create/Edit Dialog -->
     <Dialog
       :visible="showCreateDialog"
-      :header="editingProduct ? 'Edit Product' : 'Create Product'"
+      :header="editingProduct ? 'Edit Product' : 'Add new'"
       :modal="true"
       :style="{ width: '50vw' }"
+      class="product-dialog"
       data-testid="product-dialog"
-      @update:visible="$emit('update:showCreateDialog', $event)"
+      @update:visible="handleDialogClose"
     >
-      <p class="text-600">
-        Product form will be implemented here. This is a minimal working example
-        showing the architecture.
-      </p>
+      <ProductForm
+        ref="productFormRef"
+        :product="editingProduct"
+        :categories="categories"
+        @submit="handleFormSubmit"
+      />
       <template #footer>
         <Button
           label="Cancel"
-          icon="pi pi-times"
-          outlined
-          @click="$emit('close-dialog')"
+          class="dialog-button dialog-button-cancel"
+          @click="handleCloseDialog"
         />
         <Button
           label="Save"
-          icon="pi pi-check"
-          @click="$emit('close-dialog')"
+          class="dialog-button dialog-button-save"
+          @click="handleSave"
         />
       </template>
     </Dialog>
@@ -52,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -59,22 +62,50 @@ import ProductsLoadingState from "./ProductsLoadingState.vue";
 import ProductsErrorState from "./ProductsErrorState.vue";
 import ProductsList from "./ProductsList.vue";
 import ProductsEmptyState from "./ProductsEmptyState.vue";
-import type { Product } from "@/types/product";
+import ProductForm from "@/components/product/ProductForm.vue";
+import type { Product, Category, ProductFormData } from "@/types/product";
 
-defineProps<{
+const props = defineProps<{
   loading: boolean;
   error: string | null;
   products: Product[];
   showCreateDialog: boolean;
   editingProduct: Product | null;
+  categories: Category[];
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   "clear-error": [];
   view: [id: number];
   edit: [id: number];
   delete: [product: Product];
   "close-dialog": [];
   "update:showCreateDialog": [value: boolean];
+  "save-product": [data: ProductFormData, productId?: number];
 }>();
+
+const productFormRef = ref<InstanceType<typeof ProductForm> | null>(null);
+const formData = ref<ProductFormData | null>(null);
+
+const handleFormSubmit = (data: ProductFormData) => {
+  formData.value = data;
+};
+
+const handleSave = () => {
+  // Trigger form submit
+  if (productFormRef.value) {
+    productFormRef.value.submitForm();
+  }
+};
+
+const handleDialogClose = (visible: boolean) => {
+  if (!visible) {
+    handleCloseDialog();
+  }
+};
+
+const handleCloseDialog = () => {
+  formData.value = null;
+  emit("close-dialog");
+};
 </script>

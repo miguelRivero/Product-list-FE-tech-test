@@ -14,11 +14,13 @@
       :products="products"
       :show-create-dialog="showCreateDialog"
       :editing-product="editingProduct"
+      :categories="categories"
       @clear-error="clearError"
       @view="viewProduct"
       @edit="editProduct"
       @delete="confirmDelete"
-      @close-dialog="showCreateDialog = false"
+      @close-dialog="handleCloseDialog"
+      @save-product="handleSaveProduct"
     />
 
     <ProductListFooter
@@ -43,7 +45,7 @@ import ProductListFooter from "@/components/products/ProductListFooter.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
 import { useProductsStore } from "@/stores/products";
-import type { Product } from "@/types/product";
+import type { Product, ProductFormData } from "@/types/product";
 
 const router = useRouter();
 const confirm = useConfirm();
@@ -63,6 +65,8 @@ const {
   setSelectedCategory,
   setSearchQuery,
   deleteProduct,
+  createProduct,
+  updateProduct,
 } = useProducts();
 
 const clearError = () => {
@@ -98,6 +102,44 @@ const viewProduct = (id: number) => {
 const editProduct = (id: number) => {
   editingProduct.value = products.value.find((p) => p.id === id) || null;
   showCreateDialog.value = true;
+};
+
+const handleCloseDialog = () => {
+  showCreateDialog.value = false;
+  editingProduct.value = null;
+};
+
+const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
+  try {
+    if (productId) {
+      await updateProduct(productId, data);
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Product updated successfully",
+        life: 3000,
+      });
+    } else {
+      await createProduct(data);
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Product created successfully",
+        life: 3000,
+      });
+    }
+    handleCloseDialog();
+    await fetchProducts(currentPage.value, pageSize.value);
+  } catch (err) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: productId
+        ? "Failed to update product"
+        : "Failed to create product",
+      life: 3000,
+    });
+  }
 };
 
 const confirmDelete = (product: Product) => {

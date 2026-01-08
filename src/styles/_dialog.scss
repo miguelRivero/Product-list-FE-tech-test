@@ -1,0 +1,87 @@
+// Dialog styles - must be global because Dialog renders in a portal
+.product-dialog {
+  .p-dialog-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-gray;
+    background-color: $background;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .p-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  .p-dialog-header-close,
+  .p-dialog-close-button {
+    color: $text-primary;
+    transition: color 0.2s;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    &:hover {
+      color: $text-gray-600;
+    }
+
+    &:focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    &:focus-visible {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    // Remove PrimeVue default focus ring
+    &.p-focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+// Dialog button styles
+.dialog-button {
+  padding: 0.625rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+
+  &.dialog-button-cancel {
+    border: 1px solid $border-gray;
+    background-color: $component-bg;
+    color: $text-primary;
+
+    &:hover {
+      background-color: $hover-bg;
+    }
+  }
+
+  &.dialog-button-save {
+    border: none;
+    background-color: $primary;
+    color: white;
+
+    &:hover {
+      background-color: darken($primary, 5%);
+    }
+  }
+}
