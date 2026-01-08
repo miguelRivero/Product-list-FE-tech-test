@@ -21,7 +21,7 @@
       @close-dialog="showCreateDialog = false"
     />
 
-    <ProductsPagination
+    <ProductListFooter
       v-if="!loading && products.length > 0"
       :current-page="currentPage"
       :page-size="pageSize"
@@ -39,7 +39,7 @@ import { useToast } from "primevue/usetoast";
 import ProductsSearch from "@/components/products/ProductsSearch.vue";
 import ProductsToolbar from "@/components/products/ProductsToolbar.vue";
 import ProductsContent from "@/components/products/ProductsContent.vue";
-import ProductsPagination from "@/components/products/ProductsPagination.vue";
+import ProductListFooter from "@/components/products/ProductListFooter.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
 import { useProductsStore } from "@/stores/products";
