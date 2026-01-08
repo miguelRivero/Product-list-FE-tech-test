@@ -1,0 +1,135 @@
+// Category select styles - override PrimeVue defaults
+.category-select {
+  &.p-select,
+  &.p-inputwrapper {
+    background: $component-bg;
+    border: 1px solid $border-gray;
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.75rem 0.625rem 1.5rem;
+    box-shadow: none;
+    color: $text-primary;
+  }
+
+  // Remove blue border on focus states
+  &.p-select.p-focus,
+  &.p-select:focus,
+  &.p-inputwrapper.p-inputwrapper-focus,
+  &.p-inputwrapper:focus {
+    border-color: $border-gray;
+    box-shadow: none;
+    outline: none;
+  }
+
+  .p-select-label {
+    padding: 0;
+    color: $text-primary;
+    font-weight: 500;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .p-select-clear-icon,
+  .p-select-dropdown {
+    color: $text-primary;
+  }
+}
+
+// Dropdown panel styles
+.p-select-overlay,
+.p-select-panel {
+  background: $component-bg;
+  border: 1px solid $border-gray;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  outline: none;
+
+  &:focus,
+  &:focus-within {
+    outline: none;
+  }
+}
+
+.p-select-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid $border-gray;
+  background-color: $component-bg;
+}
+
+// Search input styles
+.p-iconfield {
+  .p-inputicon {
+    top: calc(50% - 0.5rem);
+  }
+
+  .p-inputtext {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid $border-gray;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    background-color: white;
+    color: $text-primary;
+
+    &:focus {
+      outline: none;
+      border-color: $border-gray;
+      box-shadow: none;
+    }
+  }
+}
+
+.p-select-filter,
+.p-inputtext.p-select-filter {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid $border-gray;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background-color: white;
+  color: $text-primary;
+
+  &:focus {
+    outline: none;
+    border-color: $border-gray;
+    box-shadow: none;
+  }
+
+  &::placeholder {
+    color: $text-primary;
+  }
+}
+
+.p-select-list-container {
+  padding: 0.5rem;
+}
+
+// Option items
+.p-select-option {
+  padding: 0.625rem 0.75rem;
+  color: $text-primary;
+  border-radius: 0.375rem;
+  margin-bottom: 0.25rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    background-color: $hover-bg;
+  }
+
+  &.p-focus,
+  &[data-p-focused="true"] {
+    background-color: $hover-bg;
+  }
+
+  &.p-selected,
+  &[data-p-selected="true"] {
+    background-color: $primary;
+    color: white;
+  }
+}

@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import Toast from "primevue/toast";
-import Header from "@/components/Header.vue";
+import Header from "@/components/layout/Header.vue";
 </script>
 
 <style scoped lang="scss">
