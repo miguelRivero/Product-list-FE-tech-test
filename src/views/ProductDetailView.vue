@@ -14,21 +14,7 @@
     <div v-else-if="product" class="product-detail-content">
       <ProductDetailNavigation @edit="handleEdit" @delete="handleDelete" />
 
-      <!-- Main Content Grid -->
-      <div class="product-main-grid px-4 sm:px-6 lg:px-8">
-        <!-- Left Column: Main Content -->
-        <div class="product-main-content pt-8">
-          <ProductDetailAttributes :product="product" />
-          <ProductDetailImagePricing :product="product" />
-          <ProductDetailDescription :product="product" />
-          <ProductDetailGallery :product="product" />
-        </div>
-
-        <!-- Right Column: Metadata Sidebar -->
-        <div class="product-metadata-sidebar pt-8">
-          <ProductDetailMetadata :product="product" />
-        </div>
-      </div>
+      <ProductDetailContent :product="product" />
     </div>
 
     <!-- Edit Dialog -->
@@ -81,11 +67,7 @@ import { useRoute, useRouter } from "vue-router";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import ProductDetailNavigation from "@/components/product-detail/ProductDetailNavigation.vue";
-import ProductDetailAttributes from "@/components/product-detail/ProductDetailAttributes.vue";
-import ProductDetailImagePricing from "@/components/product-detail/ProductDetailImagePricing.vue";
-import ProductDetailDescription from "@/components/product-detail/ProductDetailDescription.vue";
-import ProductDetailGallery from "@/components/product-detail/ProductDetailGallery.vue";
-import ProductDetailMetadata from "@/components/product-detail/ProductDetailMetadata.vue";
+import ProductDetailContent from "@/components/product-detail/ProductDetailContent.vue";
 import ProductForm from "@/components/product/ProductForm.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useDialog } from "@/composables/useDialog";
@@ -220,26 +202,6 @@ const handleDelete = () => {
 </script>
 
 <style scoped lang="scss">
-.product-main-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-
-  @media (min-width: 1024px) {
-    grid-template-columns: 2fr 1fr;
-  }
-}
-
-.product-main-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.product-metadata-sidebar {
-  border-left: 1px solid $border-gray;
-}
-
 .loading-text {
   color: $text-gray-600;
 }

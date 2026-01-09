@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex justify-between items-center mb-6 gap-4 px-4 sm:px-6 lg:px-8"
-  >
+  <div class="flex justify-between items-center mb-6 gap-4">
     <!-- Category Dropdown -->
     <ProductCategoriesSelect
       :selected-category="selectedCategory"

@@ -1,5 +1,5 @@
 <template>
-  <div class="product-list-footer px-4 sm:px-6 lg:px-8">
+  <div class="product-list-footer">
     <ProductsListInfo
       :current-page="currentPage"
       :page-size="pageSize"

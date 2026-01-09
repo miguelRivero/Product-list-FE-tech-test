@@ -2,35 +2,37 @@
   <div class="products-view">
     <ProductsSearch v-model:searchQuery="searchQuery" />
 
-    <ProductsToolbar
-      v-model:selectedCategory="selectedCategoryValue"
-      :categories="categories"
-      @add-product="showCreateDialog = true"
-    />
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ProductsToolbar
+        v-model:selectedCategory="selectedCategoryValue"
+        :categories="categories"
+        @add-product="showCreateDialog = true"
+      />
 
-    <ProductsContent
-      ref="productsContentRef"
-      :loading="loading"
-      :error="error"
-      :products="products"
-      :show-create-dialog="showCreateDialog"
-      :editing-product="editingProduct"
-      :categories="categories"
-      @clear-error="clearError"
-      @view="viewProductHandler"
-      @edit="editProductHandler"
-      @delete="confirmDelete"
-      @close-dialog="handleCloseDialog"
-      @save-product="handleSaveProduct"
-    />
+      <ProductsContent
+        ref="productsContentRef"
+        :loading="loading"
+        :error="error"
+        :products="products"
+        :show-create-dialog="showCreateDialog"
+        :editing-product="editingProduct"
+        :categories="categories"
+        @clear-error="clearError"
+        @view="viewProductHandler"
+        @edit="editProductHandler"
+        @delete="confirmDelete"
+        @close-dialog="handleCloseDialog"
+        @save-product="handleSaveProduct"
+      />
 
-    <ProductListFooter
-      v-if="!loading && products.length > 0"
-      :current-page="currentPage"
-      :page-size="pageSize"
-      :total="total"
-      @page-change="onPageChange"
-    />
+      <ProductListFooter
+        v-if="!loading && products.length > 0"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="total"
+        @page-change="onPageChange"
+      />
+    </div>
   </div>
 </template>
 

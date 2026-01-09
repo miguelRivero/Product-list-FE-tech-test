@@ -1,24 +1,28 @@
 <template>
-  <div class="product-detail-navigation shadow py-2 px-4 sm:px-6 lg:px-8">
-    <router-link to="/" class="back-link">
-      <i class="pi pi-arrow-left"></i>
-      <span>Back</span>
-    </router-link>
-    <div class="product-actions">
-      <Button
-        label="Edit"
-        icon="pi pi-pencil"
-        class="action-button"
-        @click="$emit('edit')"
-        aria-label="Edit product"
-      />
-      <Button
-        label="Delete"
-        icon="pi pi-trash"
-        class="action-button"
-        @click="$emit('delete')"
-        aria-label="Delete product"
-      />
+  <div class="product-detail-navigation shadow py-2">
+    <div
+      class="product-detail-navigation-content px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl py-2"
+    >
+      <router-link to="/" class="back-link">
+        <i class="pi pi-arrow-left"></i>
+        <span>Back</span>
+      </router-link>
+      <div class="product-actions">
+        <Button
+          label="Edit"
+          icon="pi pi-pencil"
+          class="action-button"
+          @click="$emit('edit')"
+          aria-label="Edit product"
+        />
+        <Button
+          label="Delete"
+          icon="pi pi-trash"
+          class="action-button"
+          @click="$emit('delete')"
+          aria-label="Delete product"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +37,7 @@ defineEmits<{
 </script>
 
 <style scoped lang="scss">
-.product-detail-navigation {
+.product-detail-navigation-content {
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -1,6 +1,6 @@
 <template>
-  <div class="products-search mb-6 shadow px-4 sm:px-6 lg:px-8">
-    <div class="relative w-full">
+  <div class="products-search mb-6 shadow w-full">
+    <div class="px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl py-2">
       <i
         class="pi pi-search absolute top-1/2 -translate-y-1/2 z-10 w-5 h-5 search-icon"
       />

@@ -16,7 +16,7 @@
     </div>
 
     <!-- Page Title Section -->
-    <div class="px-4 sm:px-6 lg:px-8 pt-0 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-6">
       <h2
         class="page-title max-w-7xl mx-auto m-0 text-4xl sm:text-5xl font-bold"
       >

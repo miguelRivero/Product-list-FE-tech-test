@@ -1,5 +1,5 @@
 <template>
-  <div class="products-content px-4 sm:px-6 lg:px-8">
+  <div class="products-content">
     <ProductsLoadingState v-if="loading" />
 
     <ProductsErrorState

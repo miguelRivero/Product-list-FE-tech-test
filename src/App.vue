@@ -1,7 +1,7 @@
 <template>
   <div class="app-container min-h-screen">
     <Header />
-    <main class="main-content max-w-7xl mx-auto">
+    <main class="main-content">
       <RouterView />
     </main>
     <Toast />
