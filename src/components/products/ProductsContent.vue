@@ -35,16 +35,28 @@
         @submit="handleFormSubmit"
       />
       <template #footer>
-        <Button
-          label="Cancel"
-          class="dialog-button dialog-button-cancel"
-          @click="handleCloseDialog"
-        />
-        <Button
-          label="Save"
-          class="dialog-button dialog-button-save"
-          @click="handleSave"
-        />
+        <div class="dialog-footer-content">
+          <div class="dialog-message-container">
+            <span v-if="saveError" class="dialog-error-message">
+              {{ saveError }}
+            </span>
+            <span v-else-if="saveSuccess" class="dialog-success-message">
+              {{ saveSuccess }}
+            </span>
+          </div>
+          <div class="dialog-footer-buttons">
+            <Button
+              label="Cancel"
+              class="dialog-button dialog-button-cancel"
+              @click="handleCloseDialog"
+            />
+            <Button
+              label="Save"
+              class="dialog-button dialog-button-save"
+              @click="handleSave"
+            />
+          </div>
+        </div>
       </template>
     </Dialog>
 
@@ -86,15 +98,29 @@ const emit = defineEmits<{
 
 const productFormRef = ref<InstanceType<typeof ProductForm> | null>(null);
 const formData = ref<ProductFormData | null>(null);
+const saveError = ref<string | null>(null);
+const saveSuccess = ref<string | null>(null);
 
 const handleFormSubmit = (data: ProductFormData) => {
   formData.value = data;
+  saveError.value = null;
+  saveSuccess.value = null;
 };
 
 const handleSave = () => {
-  // Trigger form submit
+  saveError.value = null;
+  saveSuccess.value = null;
+
+  // Trigger form submit to update formData
   if (productFormRef.value) {
     productFormRef.value.submitForm();
+  }
+
+  // Emit save event with form data
+  if (formData.value) {
+    emit("save-product", formData.value, props.editingProduct?.id);
+  } else {
+    saveError.value = "Please fill in all required fields";
   }
 };
 
@@ -106,6 +132,56 @@ const handleDialogClose = (visible: boolean) => {
 
 const handleCloseDialog = () => {
   formData.value = null;
+  saveError.value = null;
+  saveSuccess.value = null;
   emit("close-dialog");
 };
+
+// Expose methods to parent for setting success/error messages
+defineExpose({
+  setSaveError: (message: string) => {
+    saveError.value = message;
+  },
+  setSaveSuccess: (message: string) => {
+    saveSuccess.value = message;
+  },
+  clearMessages: () => {
+    saveError.value = null;
+    saveSuccess.value = null;
+  },
+});
 </script>
+
+<style scoped lang="scss">
+.dialog-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.dialog-message-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.dialog-error-message,
+.dialog-success-message {
+  font-size: 0.875rem;
+}
+
+.dialog-error-message {
+  color: $danger;
+}
+
+.dialog-success-message {
+  color: $success;
+}
+
+.dialog-footer-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+</style>

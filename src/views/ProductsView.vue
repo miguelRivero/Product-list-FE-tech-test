@@ -9,6 +9,7 @@
     />
 
     <ProductsContent
+      ref="productsContentRef"
       :loading="loading"
       :error="error"
       :products="products"
@@ -81,6 +82,9 @@ const { searchQuery } = useSearch((query: string) => {
 const selectedCategoryValue = ref<string | null>(null);
 const showCreateDialog = ref(false);
 const editingProduct = ref<Product | null>(null);
+const productsContentRef = ref<InstanceType<typeof ProductsContent> | null>(
+  null
+);
 
 onMounted(async () => {
   await fetchCategories();
@@ -107,38 +111,49 @@ const editProduct = (id: number) => {
 const handleCloseDialog = () => {
   showCreateDialog.value = false;
   editingProduct.value = null;
+  if (productsContentRef.value) {
+    productsContentRef.value.clearMessages();
+  }
 };
 
 const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
+  if (!productsContentRef.value) return;
+
   try {
     if (productId) {
       await updateProduct(productId, data);
-      toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Product updated successfully",
-        life: 3000,
-      });
+      productsContentRef.value.setSaveSuccess("Product updated successfully");
+      setTimeout(() => {
+        handleCloseDialog();
+      }, 1000);
     } else {
-      await createProduct(data);
-      toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Product created successfully",
-        life: 3000,
-      });
+      // Convert category slug to category name if needed
+      const categorySlug = data.category;
+      const category = categories.value.find(
+        (cat) => cat.slug === categorySlug
+      );
+      const categoryName = category ? category.name : categorySlug;
+
+      const createData: ProductFormData = {
+        ...data,
+        category: categoryName,
+      };
+
+      await createProduct(createData);
+      productsContentRef.value.setSaveSuccess("Product created successfully");
+      setTimeout(() => {
+        handleCloseDialog();
+      }, 1000);
+      // Product is already added to the top of the list by the store
     }
-    handleCloseDialog();
-    await fetchProducts(currentPage.value, pageSize.value);
   } catch (err) {
-    toast.add({
-      severity: "error",
-      summary: "Error",
-      detail: productId
+    const errorMessage =
+      err instanceof Error
+        ? err.message
+        : productId
         ? "Failed to update product"
-        : "Failed to create product",
-      life: 3000,
-    });
+        : "Failed to create product";
+    productsContentRef.value.setSaveError(errorMessage);
   }
 };
 

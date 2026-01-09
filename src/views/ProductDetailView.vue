@@ -48,16 +48,26 @@
         @submit="handleFormSubmit"
       />
       <template #footer>
-        <Button
-          label="Cancel"
-          class="dialog-button dialog-button-cancel"
-          @click="handleCloseEditDialog"
-        />
-        <Button
-          label="Save"
-          class="dialog-button dialog-button-save"
-          @click="handleSave"
-        />
+        <div class="dialog-footer-content">
+          <span v-if="saveError" class="dialog-error-message">
+            {{ saveError }}
+          </span>
+          <span v-else-if="saveSuccess" class="dialog-success-message">
+            {{ saveSuccess }}
+          </span>
+          <div class="dialog-footer-buttons">
+            <Button
+              label="Cancel"
+              class="dialog-button dialog-button-cancel"
+              @click="handleCloseEditDialog"
+            />
+            <Button
+              label="Save"
+              class="dialog-button dialog-button-save"
+              @click="handleSave"
+            />
+          </div>
+        </div>
       </template>
     </Dialog>
   </div>
@@ -100,6 +110,8 @@ const product = selectedProduct;
 const showEditDialog = ref(false);
 const productFormRef = ref<InstanceType<typeof ProductForm> | null>(null);
 const formData = ref<ProductFormData | null>(null);
+const saveError = ref<string | null>(null);
+const saveSuccess = ref<string | null>(null);
 
 onMounted(async () => {
   await fetchCategories();
@@ -121,6 +133,8 @@ watch(
 const handleEdit = () => {
   if (product.value) {
     showEditDialog.value = true;
+    saveError.value = null;
+    saveSuccess.value = null;
   }
 };
 
@@ -133,39 +147,60 @@ const handleDialogClose = (visible: boolean) => {
 const handleCloseEditDialog = () => {
   showEditDialog.value = false;
   formData.value = null;
+  saveError.value = null;
+  saveSuccess.value = null;
 };
 
 const handleFormSubmit = (data: ProductFormData) => {
   formData.value = data;
+  saveError.value = null;
+  saveSuccess.value = null;
 };
 
 const handleSave = async () => {
-  if (!formData.value || !product.value) return;
+  if (!product.value) return;
 
-  // Trigger form submit if not already submitted
+  saveError.value = null;
+  saveSuccess.value = null;
+
+  // Trigger form submit first to update formData
   if (productFormRef.value) {
     productFormRef.value.submitForm();
   }
 
-  if (formData.value) {
-    try {
-      await updateProduct(product.value.id, formData.value);
-      toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Product updated successfully",
-        life: 3000,
-      });
+  // The submit event is synchronous, so formData should be updated now
+  if (!formData.value) {
+    saveError.value = "Please fill in all required fields";
+    return;
+  }
+
+  try {
+    // Convert category slug to category name if needed
+    const categorySlug = formData.value.category;
+    const category = categories.value.find((cat) => cat.slug === categorySlug);
+    const categoryName = category ? category.name : categorySlug;
+
+    // Prepare update data with category name
+    const updateData: ProductFormData = {
+      ...formData.value,
+      category: categoryName,
+    };
+
+    await updateProduct(product.value.id, updateData);
+
+    saveSuccess.value = "Product updated successfully";
+
+    // Close dialog after a short delay to show success message
+    setTimeout(() => {
       handleCloseEditDialog();
-      await fetchProduct(product.value.id);
-    } catch (err) {
-      toast.add({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to update product",
-        life: 3000,
-      });
-    }
+    }, 1000);
+
+    // The store automatically updates selectedProduct, so the view will update reactively
+  } catch (err) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Failed to update product";
+    saveError.value = errorMessage;
+    console.error("Error updating product:", err);
   }
 };
 
@@ -219,5 +254,34 @@ const handleDelete = () => {
 
 .product-metadata-sidebar {
   border-left: 1px solid $border-gray;
+}
+
+.dialog-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.dialog-error-message,
+.dialog-success-message {
+  font-size: 0.875rem;
+  flex: 0 0 auto;
+}
+
+.dialog-error-message {
+  color: $danger;
+}
+
+.dialog-success-message {
+  color: $success;
+}
+
+.dialog-footer-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 </style>

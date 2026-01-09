@@ -17,37 +17,51 @@
 
   .p-dialog-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.75rem;
     padding: 1.5rem;
   }
 
+  // Close button styles - remove all focus indicators
   .p-dialog-header-close,
-  .p-dialog-close-button {
+  .p-dialog-close-button,
+  .p-button.p-dialog-close-button {
     color: $text-primary;
     transition: color 0.2s;
     outline: none !important;
     border: none !important;
     box-shadow: none !important;
+    outline-width: 0 !important;
+    outline-offset: 0 !important;
 
     &:hover {
       color: $text-gray-600;
     }
 
-    &:focus {
+    &:focus,
+    &:focus-visible,
+    &:focus-within {
       outline: none !important;
       border: none !important;
       box-shadow: none !important;
-    }
-
-    &:focus-visible {
-      outline: none !important;
-      border: none !important;
-      box-shadow: none !important;
+      outline-width: 0 !important;
+      outline-offset: 0 !important;
     }
 
     // Remove PrimeVue default focus ring
-    &.p-focus {
+    &.p-focus,
+    &.p-button.p-focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline-width: 0 !important;
+      outline-offset: 0 !important;
+    }
+
+    // Remove any ring utilities from Tailwind
+    &[class*="ring"],
+    &[class*="focus:ring"] {
       outline: none !important;
       border: none !important;
       box-shadow: none !important;

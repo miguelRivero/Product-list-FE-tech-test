@@ -122,27 +122,35 @@ export const useProductsStore = defineStore("products", () => {
    * Create a new product
    * Uses optimistic update pattern since DummyJSON doesn't persist
    */
+
   async function createProduct(productData: ProductFormData): Promise<Product> {
     try {
       // 1. Call API (returns fake success from DummyJSON)
       const response = await productsApi.createProduct(productData);
 
-      // 2. Generate client-side ID (DummyJSON ID won't persist)
-      // Use negative timestamp to distinguish from real IDs
-      const clientId = -Date.now();
+      // 2. Generate random positive client-side ID
+      // Use a high range (10000-99999) to avoid conflicts with API IDs
+      const clientId = Math.floor(Math.random() * 90000) + 10000;
 
-      // 3. Create product with client-side ID
+      // 3. Create placeholder image (SVG data URI)
+      const placeholderImage =
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23e2e2e2' width='300' height='200'/%3E%3Ctext fill='%236b7280' font-family='sans-serif' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+      // 4. Create product with client-side ID
       const newProduct: Product = {
         ...response,
         id: clientId,
-        thumbnail: response.thumbnail || "/placeholder.png",
-        images: response.images || [],
+        thumbnail: response.thumbnail || placeholderImage,
+        images:
+          response.images && response.images.length > 0
+            ? response.images
+            : [placeholderImage],
         rating: response.rating || 0,
         discountPercentage: response.discountPercentage || 0,
         tags: productData.tags || [],
       };
 
-      // 4. Add to local state immediately (optimistic update)
+      // 5. Add to local state immediately (optimistic update) - at the top of the list
       products.value.unshift(newProduct);
       total.value += 1;
 
@@ -163,9 +171,11 @@ export const useProductsStore = defineStore("products", () => {
     id: number,
     updates: Partial<ProductFormData>
   ): Promise<Product> {
-    // 1. Backup current state
-    const originalProduct = products.value.find((p) => p.id === id);
-    if (!originalProduct) {
+    // 1. Backup current state - check both products array and selectedProduct
+    const originalProduct =
+      products.value.find((p) => p.id === id) || selectedProduct.value;
+
+    if (!originalProduct || originalProduct.id !== id) {
       throw new Error("Product not found");
     }
 
@@ -186,16 +196,33 @@ export const useProductsStore = defineStore("products", () => {
       } as Product;
     }
 
-    try {
-      // 3. Call API in background (fake response from DummyJSON)
-      await productsApi.updateProduct(id, updates);
-      return products.value[productIndex] as Product;
-    } catch (err) {
-      // 4. Rollback on error
+    // 3. Check if product is client-side created (ID >= 10000)
+    // Products from API typically have IDs < 10000, client-created are in range 10000-99999
+    const isClientCreated = id >= 10000 && id < 100000;
+
+    if (isClientCreated) {
+      // Product was created locally, just return updated product without API call
       if (productIndex !== -1) {
+        return products.value[productIndex] as Product;
+      }
+      return selectedProduct.value as Product;
+    }
+
+    try {
+      // 4. Call API in background (fake response from DummyJSON) only for real products
+      await productsApi.updateProduct(id, updates);
+
+      // Return the updated product
+      if (productIndex !== -1) {
+        return products.value[productIndex] as Product;
+      }
+      return selectedProduct.value as Product;
+    } catch (err) {
+      // 5. Rollback on error
+      if (productIndex !== -1 && originalProduct) {
         products.value[productIndex] = originalProduct;
       }
-      if (selectedProduct.value?.id === id) {
+      if (selectedProduct.value?.id === id && originalProduct) {
         selectedProduct.value = originalProduct;
       }
       error.value =
