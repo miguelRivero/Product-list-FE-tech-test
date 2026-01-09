@@ -11,6 +11,7 @@
     <ProductsList
       v-if="!loading && !error && products.length > 0"
       :products="products"
+      :categories="categories"
       @view="$emit('view', $event)"
       @edit="$emit('edit', $event)"
       @delete="$emit('delete', $event)"
@@ -75,6 +76,7 @@ import ProductsErrorState from "./ProductsErrorState.vue";
 import ProductsList from "./ProductsList.vue";
 import ProductsEmptyState from "./ProductsEmptyState.vue";
 import ProductForm from "@/components/product/ProductForm.vue";
+import { useDialog } from "@/composables/useDialog";
 import type { Product, Category, ProductFormData } from "@/types/product";
 
 const props = defineProps<{
@@ -97,19 +99,23 @@ const emit = defineEmits<{
 }>();
 
 const productFormRef = ref<InstanceType<typeof ProductForm> | null>(null);
-const formData = ref<ProductFormData | null>(null);
-const saveError = ref<string | null>(null);
-const saveSuccess = ref<string | null>(null);
+const dialogState = useDialog();
+const {
+  formData,
+  error: saveError,
+  success: saveSuccess,
+  setError,
+  setSuccess,
+  clearMessages,
+} = dialogState;
 
 const handleFormSubmit = (data: ProductFormData) => {
   formData.value = data;
-  saveError.value = null;
-  saveSuccess.value = null;
+  clearMessages();
 };
 
 const handleSave = () => {
-  saveError.value = null;
-  saveSuccess.value = null;
+  clearMessages();
 
   // Trigger form submit to update formData
   if (productFormRef.value) {
@@ -120,7 +126,7 @@ const handleSave = () => {
   if (formData.value) {
     emit("save-product", formData.value, props.editingProduct?.id);
   } else {
-    saveError.value = "Please fill in all required fields";
+    setError("Please fill in all required fields");
   }
 };
 
@@ -132,23 +138,15 @@ const handleDialogClose = (visible: boolean) => {
 
 const handleCloseDialog = () => {
   formData.value = null;
-  saveError.value = null;
-  saveSuccess.value = null;
+  clearMessages();
   emit("close-dialog");
 };
 
 // Expose methods to parent for setting success/error messages
 defineExpose({
-  setSaveError: (message: string) => {
-    saveError.value = message;
-  },
-  setSaveSuccess: (message: string) => {
-    saveSuccess.value = message;
-  },
-  clearMessages: () => {
-    saveError.value = null;
-    saveSuccess.value = null;
-  },
+  setSaveError: setError,
+  setSaveSuccess: setSuccess,
+  clearMessages,
 });
 </script>
 

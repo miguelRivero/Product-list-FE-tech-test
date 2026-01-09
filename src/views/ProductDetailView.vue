@@ -2,12 +2,12 @@
   <div class="product-detail-view">
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
-      <p class="text-[#6b7280]">Loading product...</p>
+      <p class="loading-text">Loading product...</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="py-12">
-      <p class="text-[#ef4444]">{{ error }}</p>
+      <p class="error-text">{{ error }}</p>
     </div>
 
     <!-- Product Content -->
@@ -49,12 +49,14 @@
       />
       <template #footer>
         <div class="dialog-footer-content">
-          <span v-if="saveError" class="dialog-error-message">
-            {{ saveError }}
-          </span>
-          <span v-else-if="saveSuccess" class="dialog-success-message">
-            {{ saveSuccess }}
-          </span>
+          <div class="dialog-message-container">
+            <span v-if="saveError" class="dialog-error-message">
+              {{ saveError }}
+            </span>
+            <span v-else-if="saveSuccess" class="dialog-success-message">
+              {{ saveSuccess }}
+            </span>
+          </div>
           <div class="dialog-footer-buttons">
             <Button
               label="Cancel"
@@ -74,10 +76,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import ProductDetailNavigation from "@/components/product-detail/ProductDetailNavigation.vue";
@@ -88,12 +88,13 @@ import ProductDetailGallery from "@/components/product-detail/ProductDetailGalle
 import ProductDetailMetadata from "@/components/product-detail/ProductDetailMetadata.vue";
 import ProductForm from "@/components/product/ProductForm.vue";
 import { useProducts } from "@/composables/useProducts";
+import { useDialog } from "@/composables/useDialog";
+import { useCategory } from "@/composables/useCategory";
+import { useProductActions } from "@/composables/useProductActions";
 import type { ProductFormData } from "@/types/product";
 
 const route = useRoute();
 const router = useRouter();
-const confirm = useConfirm();
-const toast = useToast();
 
 const {
   selectedProduct,
@@ -109,9 +110,19 @@ const {
 const product = selectedProduct;
 const showEditDialog = ref(false);
 const productFormRef = ref<InstanceType<typeof ProductForm> | null>(null);
-const formData = ref<ProductFormData | null>(null);
-const saveError = ref<string | null>(null);
-const saveSuccess = ref<string | null>(null);
+const dialogState = useDialog();
+const {
+  formData,
+  error: saveError,
+  success: saveSuccess,
+  setError,
+  setSuccess,
+  clearMessages,
+  handleDialogClose: dialogCloseHandler,
+} = dialogState;
+
+const { slugToName } = useCategory(categories);
+const { confirmDelete: confirmProductDelete } = useProductActions();
 
 onMounted(async () => {
   await fetchCategories();
@@ -133,8 +144,7 @@ watch(
 const handleEdit = () => {
   if (product.value) {
     showEditDialog.value = true;
-    saveError.value = null;
-    saveSuccess.value = null;
+    clearMessages();
   }
 };
 
@@ -147,21 +157,18 @@ const handleDialogClose = (visible: boolean) => {
 const handleCloseEditDialog = () => {
   showEditDialog.value = false;
   formData.value = null;
-  saveError.value = null;
-  saveSuccess.value = null;
+  clearMessages();
 };
 
 const handleFormSubmit = (data: ProductFormData) => {
   formData.value = data;
-  saveError.value = null;
-  saveSuccess.value = null;
+  clearMessages();
 };
 
 const handleSave = async () => {
   if (!product.value) return;
 
-  saveError.value = null;
-  saveSuccess.value = null;
+  clearMessages();
 
   // Trigger form submit first to update formData
   if (productFormRef.value) {
@@ -170,15 +177,14 @@ const handleSave = async () => {
 
   // The submit event is synchronous, so formData should be updated now
   if (!formData.value) {
-    saveError.value = "Please fill in all required fields";
+    setError("Please fill in all required fields");
     return;
   }
 
   try {
     // Convert category slug to category name if needed
     const categorySlug = formData.value.category;
-    const category = categories.value.find((cat) => cat.slug === categorySlug);
-    const categoryName = category ? category.name : categorySlug;
+    const categoryName = slugToName(categorySlug);
 
     // Prepare update data with category name
     const updateData: ProductFormData = {
@@ -188,7 +194,7 @@ const handleSave = async () => {
 
     await updateProduct(product.value.id, updateData);
 
-    saveSuccess.value = "Product updated successfully";
+    setSuccess("Product updated successfully");
 
     // Close dialog after a short delay to show success message
     setTimeout(() => {
@@ -199,7 +205,7 @@ const handleSave = async () => {
   } catch (err) {
     const errorMessage =
       err instanceof Error ? err.message : "Failed to update product";
-    saveError.value = errorMessage;
+    setError(errorMessage);
     console.error("Error updating product:", err);
   }
 };
@@ -207,30 +213,8 @@ const handleSave = async () => {
 const handleDelete = () => {
   if (!product.value) return;
 
-  confirm.require({
-    message: `Are you sure you want to delete "${product.value.title}"?`,
-    header: "Delete Confirmation",
-    icon: "pi pi-exclamation-triangle",
-    acceptClass: "p-button-danger",
-    accept: async () => {
-      try {
-        await deleteProduct(product.value!.id);
-        toast.add({
-          severity: "success",
-          summary: "Success",
-          detail: "Product deleted successfully",
-          life: 3000,
-        });
-        router.push("/");
-      } catch (err) {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to delete product",
-          life: 3000,
-        });
-      }
-    },
+  confirmProductDelete(product.value, deleteProduct, () => {
+    router.push("/");
   });
 };
 </script>
@@ -256,6 +240,14 @@ const handleDelete = () => {
   border-left: 1px solid $border-gray;
 }
 
+.loading-text {
+  color: $text-gray-600;
+}
+
+.error-text {
+  color: $danger;
+}
+
 .dialog-footer-content {
   display: flex;
   justify-content: space-between;
@@ -264,10 +256,14 @@ const handleDelete = () => {
   gap: 1rem;
 }
 
+.dialog-message-container {
+  flex: 1;
+  min-width: 0;
+}
+
 .dialog-error-message,
 .dialog-success-message {
   font-size: 0.875rem;
-  flex: 0 0 auto;
 }
 
 .dialog-error-message {

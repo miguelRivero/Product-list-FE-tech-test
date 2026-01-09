@@ -6,7 +6,7 @@
       data-testid="view-button"
       aria-label="View product"
     >
-      <i class="pi pi-eye action-icon w-5 h-5 text-[#6b7280]" />
+      <i class="pi pi-eye action-icon" />
     </button>
     <button
       class="action-icon-button p-2 rounded transition-colors"
@@ -14,7 +14,7 @@
       data-testid="edit-button"
       aria-label="Edit product"
     >
-      <i class="pi pi-pencil action-icon w-5 h-5 text-[#6b7280]" />
+      <i class="pi pi-pencil action-icon" />
     </button>
     <button
       class="action-icon-button p-2 rounded transition-colors"
@@ -22,7 +22,7 @@
       data-testid="delete-button"
       aria-label="Delete product"
     >
-      <i class="pi pi-trash action-icon w-5 h-5 text-[#6b7280]" />
+      <i class="pi pi-trash action-icon" />
     </button>
   </div>
 </template>
@@ -47,5 +47,11 @@ defineEmits<{
   &:hover {
     background-color: $background;
   }
+}
+
+.action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: $text-gray-600;
 }
 </style>

@@ -6,24 +6,12 @@
     >
       <thead>
         <tr class="table-header-row">
-          <th
-            class="px-6 py-4 text-left text-sm text-[#374151] font-normal"
-          ></th>
-          <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
-            Title
-          </th>
-          <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
-            Category
-          </th>
-          <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
-            Price
-          </th>
-          <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
-            Stock
-          </th>
-          <th class="px-6 py-4 text-left text-sm text-[#374151] font-normal">
-            Actions
-          </th>
+          <th class="table-header-cell"></th>
+          <th class="table-header-cell">Title</th>
+          <th class="table-header-cell">Category</th>
+          <th class="table-header-cell">Price</th>
+          <th class="table-header-cell">Stock</th>
+          <th class="table-header-cell">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -44,28 +32,24 @@
             </div>
           </td>
           <td class="product-title-cell px-6 py-4 align-middle min-w-[200px]">
-            <span
-              class="product-title-text text-base font-medium text-[#373a39]"
-            >
+            <span class="product-title-text">
               {{ product.title }}
             </span>
           </td>
           <td
             class="product-category-cell px-6 py-4 align-middle min-w-[120px]"
           >
-            <span class="product-category-text text-sm text-[#6b7280]">
+            <span class="product-category-text">
               {{ capitalizeCategory(product.category) }}
             </span>
           </td>
           <td class="product-price-cell px-6 py-4 align-middle min-w-[120px]">
-            <span
-              class="product-price-text text-sm text-[#6b7280] font-semibold"
-            >
+            <span class="product-price-text">
               ${{ product.price.toFixed(2) }}
             </span>
           </td>
           <td class="product-stock-cell px-6 py-4 align-middle min-w-[120px]">
-            <span class="product-stock-text text-sm text-[#6b7280]">
+            <span class="product-stock-text">
               {{ product.stock }}
             </span>
           </td>
@@ -85,11 +69,15 @@
 </template>
 
 <script setup lang="ts">
-import type { Product } from "@/types/product";
+import { computed, type Ref } from "vue";
+import type { Product, Category } from "@/types/product";
 import ProductListActions from "./ProductListActions.vue";
+import { useImageError } from "@/composables/useImageError";
+import { useCategory } from "@/composables/useCategory";
 
-defineProps<{
+const props = defineProps<{
   products: Product[];
+  categories?: Category[];
 }>();
 
 defineEmits<{
@@ -98,18 +86,9 @@ defineEmits<{
   delete: [product: Product];
 }>();
 
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  img.src =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%23e2e2e2' width='64' height='64'/%3E%3Ctext fill='%23999' font-family='sans-serif' font-size='10' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
-};
-
-const capitalizeCategory = (category: string): string => {
-  return category
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
+const { handleImageError } = useImageError();
+const categoriesRef = computed(() => props.categories || []);
+const { capitalizeCategory } = useCategory(categoriesRef as Ref<Category[]>);
 </script>
 
 <style scoped lang="scss">
@@ -122,6 +101,14 @@ const capitalizeCategory = (category: string): string => {
   thead {
     background-color: $background;
   }
+}
+
+.table-header-cell {
+  padding: 1.5rem 1.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: normal;
+  color: $text-gray-700;
 }
 
 .table-header-row {
@@ -153,5 +140,22 @@ const capitalizeCategory = (category: string): string => {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.product-title-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.product-category-text,
+.product-price-text,
+.product-stock-text {
+  font-size: 0.875rem;
+  color: $text-gray-600;
+}
+
+.product-price-text {
+  font-weight: 600;
 }
 </style>

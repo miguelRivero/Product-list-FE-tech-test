@@ -17,8 +17,8 @@
       :editing-product="editingProduct"
       :categories="categories"
       @clear-error="clearError"
-      @view="viewProduct"
-      @edit="editProduct"
+      @view="viewProductHandler"
+      @edit="editProductHandler"
       @delete="confirmDelete"
       @close-dialog="handleCloseDialog"
       @save-product="handleSaveProduct"
@@ -35,22 +35,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import { useRouter } from "vue-router";
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
+import { ref, onMounted, watch, computed } from "vue";
 import ProductsSearch from "@/components/products/ProductsSearch.vue";
 import ProductsToolbar from "@/components/products/ProductsToolbar.vue";
 import ProductsContent from "@/components/products/ProductsContent.vue";
 import ProductListFooter from "@/components/products/ProductListFooter.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
+import { useCategory } from "@/composables/useCategory";
+import { useProductActions } from "@/composables/useProductActions";
 import { useProductsStore } from "@/stores/products";
 import type { Product, ProductFormData } from "@/types/product";
 
-const router = useRouter();
-const confirm = useConfirm();
-const toast = useToast();
+const store = useProductsStore();
 
 const {
   products,
@@ -71,13 +68,19 @@ const {
 } = useProducts();
 
 const clearError = () => {
-  const store = useProductsStore();
   store.error = null;
 };
 
 const { searchQuery } = useSearch((query: string) => {
   setSearchQuery(query);
 });
+
+const { slugToName } = useCategory(categories);
+const {
+  viewProduct,
+  editProduct: getEditProduct,
+  confirmDelete: confirmProductDelete,
+} = useProductActions();
 
 const selectedCategoryValue = ref<string | null>(null);
 const showCreateDialog = ref(false);
@@ -99,12 +102,12 @@ const onPageChange = (event: { page: number; first: number; rows: number }) => {
   fetchProducts(event.page + 1, event.rows);
 };
 
-const viewProduct = (id: number) => {
-  router.push(`/products/${id}`);
+const viewProductHandler = (id: number) => {
+  viewProduct(id);
 };
 
-const editProduct = (id: number) => {
-  editingProduct.value = products.value.find((p) => p.id === id) || null;
+const editProductHandler = (id: number) => {
+  editingProduct.value = getEditProduct(id, products.value);
   showCreateDialog.value = true;
 };
 
@@ -129,10 +132,7 @@ const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
     } else {
       // Convert category slug to category name if needed
       const categorySlug = data.category;
-      const category = categories.value.find(
-        (cat) => cat.slug === categorySlug
-      );
-      const categoryName = category ? category.name : categorySlug;
+      const categoryName = slugToName(categorySlug);
 
       const createData: ProductFormData = {
         ...data,
@@ -158,30 +158,7 @@ const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
 };
 
 const confirmDelete = (product: Product) => {
-  confirm.require({
-    message: `Are you sure you want to delete "${product.title}"?`,
-    header: "Delete Confirmation",
-    icon: "pi pi-exclamation-triangle",
-    acceptClass: "p-button-danger",
-    accept: async () => {
-      try {
-        await deleteProduct(product.id);
-        toast.add({
-          severity: "success",
-          summary: "Success",
-          detail: "Product deleted successfully",
-          life: 3000,
-        });
-      } catch (err) {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to delete product",
-          life: 3000,
-        });
-      }
-    },
-  });
+  confirmProductDelete(product, deleteProduct);
 };
 </script>
 
