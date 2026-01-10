@@ -44,6 +44,7 @@ defineEmits<{
 
 <style scoped lang="scss">
 .action-icon-button {
+  cursor: pointer;
   &:hover {
     background-color: $background;
   }
