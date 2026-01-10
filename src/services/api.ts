@@ -5,6 +5,7 @@ import type {
   ProductsResponse,
 } from "@/types/product";
 import axios, { AxiosError, AxiosInstance } from "axios";
+import { logger } from "@/utils/logger";
 
 // API base URL - supports BFF pattern via environment variable
 // Defaults to DummyJSON for current implementation
@@ -35,15 +36,27 @@ api.interceptors.response.use(
       error.message ||
       "Unknown error";
 
-    console.error("API Error:", message);
-
     // Handle specific error cases
     if (error.code === "ERR_NETWORK") {
-      console.error("Network error: No internet connection");
+      logger.error("Network error: No internet connection", error as Error, {
+        url: error.config?.url,
+      });
     } else if (error.response?.status === 404) {
-      console.error("Resource not found");
+      logger.error("Resource not found", error as Error, {
+        url: error.config?.url,
+        status: error.response.status,
+      });
     } else if (error.response?.status === 429) {
-      console.error("Rate limit exceeded: Too many requests");
+      logger.error("Rate limit exceeded: Too many requests", error as Error, {
+        url: error.config?.url,
+        status: error.response.status,
+      });
+    } else {
+      logger.error("API Error", error as Error, {
+        message,
+        url: error.config?.url,
+        status: error.response?.status,
+      });
     }
 
     return Promise.reject(error);

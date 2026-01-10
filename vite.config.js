@@ -22,5 +22,26 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: [],
+    include: ["src/**/*.{spec,test}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    exclude: [
+      "node_modules",
+      "dist",
+      "tests/**",
+      "**/*.e2e.{spec,test}.{js,ts}",
+      "**/e2e/**",
+    ],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      exclude: [
+        "node_modules/",
+        "tests/",
+        "**/*.spec.ts",
+        "**/*.test.ts",
+        "**/types/**",
+        "vite.config.*",
+        "playwright.config.*",
+      ],
+    },
   },
 });

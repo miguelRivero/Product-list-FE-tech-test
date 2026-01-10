@@ -28,6 +28,7 @@
                 :src="product.thumbnail"
                 :alt="product.title"
                 class="product-image w-full h-full rounded-md object-cover"
+                loading="lazy"
                 @error="handleImageError"
               />
             </div>

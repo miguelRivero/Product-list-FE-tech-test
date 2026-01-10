@@ -3,8 +3,8 @@
     <div
       class="product-detail-navigation-content px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl py-2"
     >
-      <router-link to="/" class="back-link">
-        <i class="pi pi-arrow-left"></i>
+      <router-link to="/" class="back-link" aria-label="Back to products list">
+        <i class="pi pi-arrow-left" aria-hidden="true"></i>
         <span>Back</span>
       </router-link>
       <div class="product-actions">

@@ -6,6 +6,7 @@
         :src="product.thumbnail"
         :alt="product.title"
         class="product-main-image"
+        loading="eager"
         @error="handleImageError"
       />
     </div>

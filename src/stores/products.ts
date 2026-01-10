@@ -8,6 +8,10 @@ import { computed, ref } from "vue";
 
 import { defineStore } from "pinia";
 import { productsApi } from "@/services/api";
+import { logger } from "@/utils/logger";
+import { generateSecureClientId, isClientGeneratedId } from "@/utils/idGenerator";
+import { apiCache } from "@/utils/apiCache";
+import { CACHE_TTL } from "@/utils/constants";
 
 export const useProductsStore = defineStore("products", () => {
   // State
@@ -39,35 +43,69 @@ export const useProductsStore = defineStore("products", () => {
 
     try {
       let response: ProductsResponse;
+      const skip = (page - 1) * limit;
+      const cacheParams = { page, limit, skip, search: searchQuery.value, category: selectedCategory.value };
 
       if (searchQuery.value) {
-        // Search products
-        const skip = (page - 1) * limit;
-        response = await productsApi.searchProducts(
-          searchQuery.value,
-          limit,
-          skip
-        );
+        // Check cache first
+        const cacheKey = `/products/search`;
+        const cached = apiCache.get<ProductsResponse>(cacheKey, cacheParams);
+        if (cached) {
+          response = cached;
+          logger.debug("Using cached search results", { query: searchQuery.value });
+        } else {
+          // Search products
+          response = await productsApi.searchProducts(
+            searchQuery.value,
+            limit,
+            skip
+          );
+          // Cache for 1 minute (search results change frequently)
+          apiCache.set(cacheKey, response, cacheParams, CACHE_TTL.SEARCH_RESULTS);
+        }
       } else if (selectedCategory.value) {
-        // Filter by category
-        const skip = (page - 1) * limit;
-        response = await productsApi.getProductsByCategory(
-          selectedCategory.value,
-          limit,
-          skip
-        );
+        // Check cache first
+        const cacheKey = `/products/category/${selectedCategory.value}`;
+        const cached = apiCache.get<ProductsResponse>(cacheKey, cacheParams);
+        if (cached) {
+          response = cached;
+          logger.debug("Using cached category results", { category: selectedCategory.value });
+        } else {
+          // Filter by category
+          response = await productsApi.getProductsByCategory(
+            selectedCategory.value,
+            limit,
+            skip
+          );
+          // Cache for 5 minutes
+          apiCache.set(cacheKey, response, cacheParams, CACHE_TTL.PRODUCTS_LIST);
+        }
       } else {
-        // Get all products
-        const skip = (page - 1) * limit;
-        response = await productsApi.getProducts(limit, skip);
+        // Check cache first
+        const cacheKey = `/products`;
+        const cached = apiCache.get<ProductsResponse>(cacheKey, cacheParams);
+        if (cached) {
+          response = cached;
+          logger.debug("Using cached products");
+        } else {
+          // Get all products
+          response = await productsApi.getProducts(limit, skip);
+          // Cache for 5 minutes
+          apiCache.set(cacheKey, response, cacheParams, CACHE_TTL.PRODUCTS_LIST);
+        }
       }
 
       products.value = response.products;
       total.value = response.total;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : "Failed to fetch products";
-      console.error("Error fetching products:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch products";
+      error.value = errorMessage;
+      logger.error("Error fetching products", err instanceof Error ? err : new Error(errorMessage), {
+        page,
+        limit,
+        searchQuery: searchQuery.value,
+        category: selectedCategory.value,
+      });
     } finally {
       loading.value = false;
     }
@@ -81,11 +119,21 @@ export const useProductsStore = defineStore("products", () => {
     error.value = null;
 
     try {
-      selectedProduct.value = await productsApi.getProduct(id);
+      // Check cache first
+      const cacheKey = `/products/${id}`;
+      const cached = apiCache.get<Product>(cacheKey);
+      if (cached) {
+        selectedProduct.value = cached;
+        logger.debug("Using cached product", { id });
+      } else {
+        selectedProduct.value = await productsApi.getProduct(id);
+        // Cache for 10 minutes (product details don't change often)
+        apiCache.set(cacheKey, selectedProduct.value, undefined, CACHE_TTL.PRODUCT_DETAIL);
+      }
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : "Failed to fetch product";
-      console.error("Error fetching product:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch product";
+      error.value = errorMessage;
+      logger.error("Error fetching product", err instanceof Error ? err : new Error(errorMessage), { id });
     } finally {
       loading.value = false;
     }
@@ -96,9 +144,19 @@ export const useProductsStore = defineStore("products", () => {
    */
   async function fetchCategories() {
     try {
-      categories.value = await productsApi.getCategories();
+      // Check cache first (categories rarely change)
+      const cacheKey = `/products/categories`;
+      const cached = apiCache.get<Category[]>(cacheKey);
+      if (cached) {
+        categories.value = cached;
+        logger.debug("Using cached categories");
+      } else {
+        categories.value = await productsApi.getCategories();
+        // Cache for 1 hour (categories rarely change)
+        apiCache.set(cacheKey, categories.value, undefined, CACHE_TTL.CATEGORIES);
+      }
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      logger.error("Error fetching categories", err instanceof Error ? err : new Error("Unknown error"));
     }
   }
 
@@ -128,9 +186,8 @@ export const useProductsStore = defineStore("products", () => {
       // 1. Call API (returns fake success from DummyJSON)
       const response = await productsApi.createProduct(productData);
 
-      // 2. Generate random positive client-side ID
-      // Use a high range (10000-99999) to avoid conflicts with API IDs
-      const clientId = Math.floor(Math.random() * 90000) + 10000;
+      // 2. Generate secure client-side ID
+      const clientId = generateSecureClientId();
 
       // 3. Create placeholder image (SVG data URI)
       const placeholderImage =
@@ -154,11 +211,18 @@ export const useProductsStore = defineStore("products", () => {
       products.value.unshift(newProduct);
       total.value += 1;
 
+      // 6. Invalidate product list cache since we added a new product
+      apiCache.invalidatePattern("^/products");
+
+      logger.info("Product created successfully", { id: clientId, title: productData.title });
+
       return newProduct;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : "Failed to create product";
-      console.error("Error creating product:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to create product";
+      error.value = errorMessage;
+      logger.error("Error creating product", err instanceof Error ? err : new Error(errorMessage), {
+        productData,
+      });
       throw err;
     }
   }
@@ -196,9 +260,8 @@ export const useProductsStore = defineStore("products", () => {
       } as Product;
     }
 
-    // 3. Check if product is client-side created (ID >= 10000)
-    // Products from API typically have IDs < 10000, client-created are in range 10000-99999
-    const isClientCreated = id >= 10000 && id < 100000;
+    // 3. Check if product is client-side created
+    const isClientCreated = isClientGeneratedId(id);
 
     if (isClientCreated) {
       // Product was created locally, just return updated product without API call
@@ -211,6 +274,12 @@ export const useProductsStore = defineStore("products", () => {
     try {
       // 4. Call API in background (fake response from DummyJSON) only for real products
       await productsApi.updateProduct(id, updates);
+
+      // Invalidate caches for this product and product list
+      apiCache.invalidate(`/products/${id}`);
+      apiCache.invalidatePattern("^/products");
+
+      logger.info("Product updated successfully", { id, updates });
 
       // Return the updated product
       if (productIndex !== -1) {
@@ -225,9 +294,12 @@ export const useProductsStore = defineStore("products", () => {
       if (selectedProduct.value?.id === id && originalProduct) {
         selectedProduct.value = originalProduct;
       }
-      error.value =
-        err instanceof Error ? err.message : "Failed to update product";
-      console.error("Error updating product:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to update product";
+      error.value = errorMessage;
+      logger.error("Error updating product", err instanceof Error ? err : new Error(errorMessage), {
+        id,
+        updates,
+      });
       throw err;
     }
   }
@@ -264,8 +336,14 @@ export const useProductsStore = defineStore("products", () => {
     try {
       // 3. Call API in background (fake response from DummyJSON)
       await productsApi.deleteProduct(id);
+
+      // 4. Invalidate caches
+      apiCache.invalidate(`/products/${id}`);
+      apiCache.invalidatePattern("^/products");
+
+      logger.info("Product deleted successfully", { id });
     } catch (err) {
-      // 4. Restore on error
+      // 5. Restore on error
       if (productIndex !== -1 && productInList) {
         products.value.splice(productIndex, 0, productInList);
         total.value += 1;
@@ -273,9 +351,9 @@ export const useProductsStore = defineStore("products", () => {
         // Restore total if product was only in selectedProduct
         total.value += 1;
       }
-      error.value =
-        err instanceof Error ? err.message : "Failed to delete product";
-      console.error("Error deleting product:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete product";
+      error.value = errorMessage;
+      logger.error("Error deleting product", err instanceof Error ? err : new Error(errorMessage), { id });
       throw err;
     }
   }

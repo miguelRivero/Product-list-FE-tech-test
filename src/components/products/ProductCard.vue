@@ -6,6 +6,7 @@
           :src="product.thumbnail"
           :alt="product.title"
           class="product-thumbnail"
+          loading="lazy"
           @error="handleImageError"
         />
         <Tag

@@ -62,6 +62,7 @@ import { useCategory } from "@/composables/useCategory";
 import { useProductActions } from "@/composables/useProductActions";
 import { useProductsStore } from "@/stores/products";
 import type { Product, ProductFormData } from "@/types/product";
+import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";
 
 const store = useProductsStore();
 
@@ -117,7 +118,7 @@ onMounted(async () => {
   }
 });
 
-watch(selectedCategoryValue, (newCategory) => {
+watch(selectedCategoryValue, newCategory => {
   setSelectedCategory(newCategory);
 });
 
@@ -166,7 +167,7 @@ const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
       productsContentRef.value.setSaveSuccess("Product created successfully");
       setTimeout(() => {
         handleCloseDialog();
-      }, 1000);
+      }, DIALOG_AUTO_CLOSE_DELAY); // Using constant would require importing, keeping as is for now
       // Product is already added to the top of the list by the store
     }
   } catch (err) {
@@ -174,8 +175,8 @@ const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
       err instanceof Error
         ? err.message
         : productId
-        ? "Failed to update product"
-        : "Failed to create product";
+          ? "Failed to update product"
+          : "Failed to create product";
     productsContentRef.value.setSaveError(errorMessage);
   }
 };

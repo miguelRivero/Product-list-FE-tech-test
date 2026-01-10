@@ -13,6 +13,7 @@
           :src="image"
           :alt="`${product.title} - Image ${index + 1}`"
           class="gallery-image w-full h-full rounded-md object-cover"
+          loading="lazy"
           @error="handleImageError"
         />
       </div>

@@ -47,11 +47,14 @@
             <Button
               label="Cancel"
               class="dialog-button dialog-button-cancel"
+              :disabled="isSaving"
               @click="handleCloseEditDialog"
             />
             <Button
               label="Save"
               class="dialog-button dialog-button-save"
+              :loading="isSaving"
+              :disabled="isSaving"
               @click="handleSave"
             />
           </div>
@@ -87,6 +90,7 @@ import { useProducts } from "@/composables/useProducts";
 import { useDialog } from "@/composables/useDialog";
 import { useCategory } from "@/composables/useCategory";
 import type { ProductFormData } from "@/types/product";
+import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";
 
 const route = useRoute();
 const router = useRouter();
@@ -134,7 +138,7 @@ onMounted(async () => {
 
 watch(
   () => route.params.id,
-  async (newId) => {
+  async newId => {
     if (newId) {
       await fetchProduct(Number(newId));
     }
@@ -149,15 +153,17 @@ const handleEdit = () => {
 };
 
 const handleDialogClose = (visible: boolean) => {
-  if (!visible) {
+  if (!visible && !isSaving.value) {
     handleCloseEditDialog();
   }
 };
 
 const handleCloseEditDialog = () => {
+  if (isSaving.value) return; // Prevent closing while saving
   showEditDialog.value = false;
   formData.value = null;
   clearMessages();
+  isSaving.value = false;
 };
 
 const handleFormSubmit = (data: ProductFormData) => {
@@ -165,23 +171,26 @@ const handleFormSubmit = (data: ProductFormData) => {
   clearMessages();
 };
 
+const isSaving = ref(false);
+
 const handleSave = async () => {
-  if (!product.value) return;
+  if (!product.value || isSaving.value) return;
 
   clearMessages();
-
-  // Trigger form submit first to update formData
-  if (productFormRef.value) {
-    productFormRef.value.submitForm();
-  }
-
-  // The submit event is synchronous, so formData should be updated now
-  if (!formData.value) {
-    setError("Please fill in all required fields");
-    return;
-  }
+  isSaving.value = true;
 
   try {
+    // Trigger form submit first to update formData
+    if (productFormRef.value) {
+      productFormRef.value.submitForm();
+    }
+
+    // The submit event is synchronous, so formData should be updated now
+    if (!formData.value) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
     // Convert category slug to category name if needed
     const categorySlug = formData.value.category;
     const categoryName = slugToName(categorySlug);
@@ -196,17 +205,19 @@ const handleSave = async () => {
 
     setSuccess("Product updated successfully");
 
-    // Close dialog after a short delay to show success message
+    // Reset saving state and close dialog after a short delay to show success message
     setTimeout(() => {
+      isSaving.value = false;
       handleCloseEditDialog();
-    }, 1000);
+    }, DIALOG_AUTO_CLOSE_DELAY);
 
     // The store automatically updates selectedProduct, so the view will update reactively
   } catch (err) {
     const errorMessage =
       err instanceof Error ? err.message : "Failed to update product";
     setError(errorMessage);
-    console.error("Error updating product:", err);
+  } finally {
+    isSaving.value = false;
   }
 };
 
@@ -232,7 +243,7 @@ const handleDeleteConfirm = async () => {
     // The store already has the updated list (optimistic update)
     setTimeout(() => {
       router.push("/");
-    }, 1000);
+    }, DIALOG_AUTO_CLOSE_DELAY);
   } catch (err) {
     deleteError.value =
       err instanceof Error ? err.message : "Failed to delete product";

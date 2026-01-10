@@ -6,7 +6,7 @@
       data-testid="view-button"
       aria-label="View product"
     >
-      <i class="pi pi-eye action-icon" />
+      <i class="pi pi-eye action-icon" aria-hidden="true" />
     </button>
     <button
       class="action-icon-button p-2 rounded transition-colors"
@@ -14,7 +14,7 @@
       data-testid="edit-button"
       aria-label="Edit product"
     >
-      <i class="pi pi-pencil action-icon" />
+      <i class="pi pi-pencil action-icon" aria-hidden="true" />
     </button>
     <button
       class="action-icon-button p-2 rounded transition-colors"
@@ -22,7 +22,7 @@
       data-testid="delete-button"
       aria-label="Delete product"
     >
-      <i class="pi pi-trash action-icon" />
+      <i class="pi pi-trash action-icon" aria-hidden="true" />
     </button>
   </div>
 </template>

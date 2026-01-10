@@ -1,14 +1,26 @@
 <template>
   <form class="product-form" @submit.prevent="handleSubmit">
+    <div v-if="Object.keys(validationErrors).length > 0" class="form-validation-errors">
+      <Message severity="error" :closable="false">
+        <ul class="validation-errors-list">
+          <li v-for="(errors, field) in validationErrors" :key="field">
+            <strong>{{ field }}:</strong> {{ errors.join(", ") }}
+          </li>
+        </ul>
+      </Message>
+    </div>
+
     <div class="form-field">
       <label for="title" class="form-label">Title</label>
       <InputText
         id="title"
         v-model="formData.title"
         class="form-input"
+        :class="{ 'p-invalid': validationErrors.title }"
         required
         data-testid="product-title-input"
       />
+      <small v-if="validationErrors.title" class="p-error">{{ validationErrors.title[0] }}</small>
     </div>
 
     <div class="form-field">
@@ -17,10 +29,12 @@
         id="description"
         v-model="formData.description"
         class="form-textarea"
+        :class="{ 'p-invalid': validationErrors.description }"
         rows="5"
         required
         data-testid="product-description-input"
       />
+      <small v-if="validationErrors.description" class="p-error">{{ validationErrors.description[0] }}</small>
     </div>
 
     <div class="form-row">
@@ -30,6 +44,7 @@
           id="price"
           v-model="formData.price"
           class="form-input"
+          :class="{ 'p-invalid': validationErrors.price }"
           mode="decimal"
           :min="0"
           :min-fraction-digits="2"
@@ -37,6 +52,7 @@
           required
           data-testid="product-price-input"
         />
+        <small v-if="validationErrors.price" class="p-error">{{ validationErrors.price[0] }}</small>
       </div>
 
       <div class="form-field">
@@ -45,6 +61,7 @@
           id="discount"
           v-model="formData.discountPercentage"
           class="form-input"
+          :class="{ 'p-invalid': validationErrors.discountPercentage }"
           mode="decimal"
           :min="0"
           :max="100"
@@ -53,6 +70,7 @@
           suffix="%"
           data-testid="product-discount-input"
         />
+        <small v-if="validationErrors.discountPercentage" class="p-error">{{ validationErrors.discountPercentage[0] }}</small>
       </div>
     </div>
 
@@ -66,9 +84,11 @@
         option-value="slug"
         placeholder="Select category"
         class="form-select"
+        :class="{ 'p-invalid': validationErrors.category }"
         required
         data-testid="product-category-select"
       />
+      <small v-if="validationErrors.category" class="p-error">{{ validationErrors.category[0] }}</small>
     </div>
 
     <div class="form-field">
@@ -77,21 +97,26 @@
         id="stock"
         v-model="formData.stock"
         class="form-input"
+        :class="{ 'p-invalid': validationErrors.stock }"
         :min="0"
         required
         data-testid="product-stock-input"
       />
+      <small v-if="validationErrors.stock" class="p-error">{{ validationErrors.stock[0] }}</small>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from "vue";
+import { reactive, watch, ref } from "vue";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import Select from "primevue/select";
-import type { Product, Category, ProductFormData } from "@/types/product";
+import Message from "primevue/message";
+import type { Product, Category } from "@/types/product";
+import { validateProductForm, sanitizeString } from "@/utils/validation";
+import type { ProductFormData } from "@/types/product";
 
 const props = defineProps<{
   product?: Product | null;
@@ -109,21 +134,26 @@ const formData = reactive<ProductFormData>({
   discountPercentage: 0,
   stock: 0,
   category: "",
+  tags: [],
 });
 
 const categoryOptions = props.categories;
+const validationErrors = ref<Record<string, string[]>>({});
 
 // Populate form when editing
 watch(
   () => props.product,
   (product) => {
     if (product) {
-      formData.title = product.title;
-      formData.description = product.description;
+      formData.title = sanitizeString(product.title);
+      formData.description = sanitizeString(product.description);
       formData.price = product.price;
       formData.discountPercentage = product.discountPercentage || 0;
       formData.stock = product.stock;
       formData.category = product.category;
+      formData.tags = product.tags || [];
+      formData.brand = product.brand;
+      validationErrors.value = {};
     } else {
       // Reset form for new product
       formData.title = "";
@@ -132,13 +162,28 @@ watch(
       formData.discountPercentage = 0;
       formData.stock = 0;
       formData.category = "";
+      formData.tags = [];
+      formData.brand = undefined;
+      validationErrors.value = {};
     }
   },
   { immediate: true }
 );
 
 const handleSubmit = () => {
-  emit("submit", { ...formData });
+  // Validate form data
+  const validation = validateProductForm(formData);
+  
+  if (!validation.success) {
+    validationErrors.value = validation.errors || {};
+    return;
+  }
+
+  // Clear validation errors
+  validationErrors.value = {};
+
+  // Emit validated and sanitized data
+  emit("submit", validation.data!);
 };
 
 // Expose method to trigger submit from parent
@@ -272,5 +317,29 @@ defineExpose({
 :deep(.p-focus) {
   border-color: $border-gray !important;
   box-shadow: none !important;
+}
+
+.form-validation-errors {
+  margin-bottom: 1rem;
+}
+
+.validation-errors-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  
+  li {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.p-error {
+  color: $danger;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+:deep(.p-invalid) {
+  border-color: $danger !important;
 }
 </style>

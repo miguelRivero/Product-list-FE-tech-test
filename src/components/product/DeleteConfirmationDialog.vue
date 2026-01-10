@@ -48,6 +48,7 @@
 import { ref, watch } from "vue";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
+import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";
 
 const props = defineProps<{
   visible: boolean;
@@ -79,11 +80,11 @@ const handleCancel = () => {
 // Close dialog when deletion is successful
 watch(
   () => props.successMessage,
-  (newValue) => {
+  newValue => {
     if (newValue) {
       setTimeout(() => {
         emit("update:visible", false);
-      }, 1000);
+      }, DIALOG_AUTO_CLOSE_DELAY);
     }
   }
 );
