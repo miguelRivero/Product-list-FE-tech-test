@@ -1,6 +1,7 @@
 <template>
-  <div class="product-list-footer">
+  <div class="product-list-footer mb-8">
     <ProductsListInfo
+      class="product-list-info"
       :current-page="currentPage"
       :page-size="pageSize"
       :total="total"
@@ -37,5 +38,11 @@ defineEmits<{
   margin-top: 1.5rem;
   background-color: $component-bg;
   border-radius: 0.5rem;
+}
+
+.product-list-info {
+  @media (max-width: 767px) {
+    display: none;
+  }
 }
 </style>

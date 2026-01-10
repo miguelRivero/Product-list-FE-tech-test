@@ -1,9 +1,10 @@
 <template>
-  <div class="products-table-container rounded-xl border">
-    <table
-      class="products-table w-full border-collapse"
-      data-testid="products-table"
-    >
+  <div class="products-table-wrapper">
+    <div class="products-table-container rounded-xl border">
+      <table
+        class="products-table w-full border-collapse"
+        data-testid="products-table"
+      >
       <thead>
         <tr class="table-header-row">
           <th class="table-header-cell"></th>
@@ -64,7 +65,8 @@
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -92,9 +94,16 @@ const { capitalizeCategory } = useCategory(categoriesRef as Ref<Category[]>);
 </script>
 
 <style scoped lang="scss">
+.products-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .products-table-container {
   background-color: $background;
   border: 1px solid $border-gray;
+  min-width: fit-content;
 }
 
 .products-table {

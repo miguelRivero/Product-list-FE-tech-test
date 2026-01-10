@@ -33,6 +33,7 @@ defineProps<{
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
+  width: 100%;
 
   @media (min-width: 1024px) {
     grid-template-columns: 2fr 1fr;
@@ -43,9 +44,19 @@ defineProps<{
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0; // Prevent overflow
 }
 
 .product-detail-metadata-sidebar {
-  border-left: 1px solid $border-gray;
+  @media (min-width: 1024px) {
+    border-left: 1px solid $border-gray;
+    padding-left: 1.5rem;
+  }
+
+  @media (max-width: 1023px) {
+    border-top: 1px solid $border-gray;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+  }
 }
 </style>

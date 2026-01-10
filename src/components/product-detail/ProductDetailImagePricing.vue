@@ -53,17 +53,28 @@ const handleImageError = (event: Event) => {
 <style scoped lang="scss">
 .product-image-pricing {
   display: flex;
+  flex-direction: column;
   gap: 1.5rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
 }
 
 .product-main-image-wrapper {
-  width: 16rem;
+  width: 100%;
+  max-width: 16rem;
   height: 16rem;
   flex-shrink: 0;
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 0.375rem;
   background-color: $skeleton;
+  margin: 0 auto;
+
+  @media (min-width: 640px) {
+    margin: 0;
+  }
 }
 
 .product-main-image {

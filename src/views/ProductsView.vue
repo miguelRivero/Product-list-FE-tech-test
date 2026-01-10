@@ -216,5 +216,7 @@ const handleDeleteCancel = () => {
 <style scoped lang="scss">
 .products-view {
   min-height: calc(100vh - 200px);
+  overflow-x: hidden;
+  width: 100%;
 }
 </style>

@@ -45,10 +45,13 @@ const formatDate = (dateString?: string): string => {
 }
 
 .metadata-content {
-  padding-left: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+
+  @media (min-width: 1024px) {
+    padding-left: 0; // Padding is handled by parent sidebar
+  }
 }
 
 .metadata-item {
@@ -59,19 +62,11 @@ const formatDate = (dateString?: string): string => {
 .metadata-label {
   color: $text-gray-600;
   margin-bottom: 0.25rem;
+  font-size: 0.875rem;
 }
 
-@media (max-width: 1024px) {
-  .product-detail-metadata {
-    border-left: none;
-    border-top: 1px solid $border-gray;
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .metadata-content {
-    border-left: none;
-    padding-left: 0;
-  }
+.metadata-value {
+  color: $text-primary;
+  font-size: 1rem;
 }
 </style>
