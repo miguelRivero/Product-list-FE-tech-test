@@ -58,6 +58,19 @@
         </div>
       </template>
     </Dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <DeleteConfirmationDialog
+      v-if="product"
+      :visible="showDeleteDialog"
+      :product-title="product.title"
+      :is-deleting="isDeleting"
+      :error-message="deleteError"
+      :success-message="deleteSuccess"
+      @update:visible="showDeleteDialog = $event"
+      @confirm="handleDeleteConfirm"
+      @cancel="handleDeleteCancel"
+    />
   </div>
 </template>
 
@@ -69,10 +82,10 @@ import Dialog from "primevue/dialog";
 import ProductDetailNavigation from "@/components/product-detail/ProductDetailNavigation.vue";
 import ProductDetailContent from "@/components/product-detail/ProductDetailContent.vue";
 import ProductForm from "@/components/product/ProductForm.vue";
+import DeleteConfirmationDialog from "@/components/product/DeleteConfirmationDialog.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useDialog } from "@/composables/useDialog";
 import { useCategory } from "@/composables/useCategory";
-import { useProductActions } from "@/composables/useProductActions";
 import type { ProductFormData } from "@/types/product";
 
 const route = useRoute();
@@ -104,7 +117,12 @@ const {
 } = dialogState;
 
 const { slugToName } = useCategory(categories);
-const { confirmDelete: confirmProductDelete } = useProductActions();
+
+// Delete dialog state
+const showDeleteDialog = ref(false);
+const isDeleting = ref(false);
+const deleteError = ref<string | null>(null);
+const deleteSuccess = ref<string | null>(null);
 
 onMounted(async () => {
   await fetchCategories();
@@ -194,10 +212,38 @@ const handleSave = async () => {
 
 const handleDelete = () => {
   if (!product.value) return;
+  deleteError.value = null;
+  deleteSuccess.value = null;
+  showDeleteDialog.value = true;
+};
 
-  confirmProductDelete(product.value, deleteProduct, () => {
-    router.push("/");
-  });
+const handleDeleteConfirm = async () => {
+  if (!product.value) return;
+
+  isDeleting.value = true;
+  deleteError.value = null;
+  deleteSuccess.value = null;
+
+  try {
+    await deleteProduct(product.value.id);
+    deleteSuccess.value = "Product deleted successfully";
+
+    // Navigate to home after successful delete
+    // The store already has the updated list (optimistic update)
+    setTimeout(() => {
+      router.push("/");
+    }, 1000);
+  } catch (err) {
+    deleteError.value =
+      err instanceof Error ? err.message : "Failed to delete product";
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const handleDeleteCancel = () => {
+  deleteError.value = null;
+  deleteSuccess.value = null;
 };
 </script>
 

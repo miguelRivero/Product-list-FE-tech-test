@@ -237,9 +237,11 @@ export const useProductsStore = defineStore("products", () => {
    * Uses optimistic update pattern since DummyJSON doesn't persist
    */
   async function deleteProduct(id: number): Promise<void> {
-    // 1. Backup current state
-    const backup = products.value.find((p) => p.id === id);
-    if (!backup) {
+    // 1. Backup current state - check both products array and selectedProduct
+    const productInList = products.value.find((p) => p.id === id);
+    const productInSelected = selectedProduct.value?.id === id ? selectedProduct.value : null;
+
+    if (!productInList && !productInSelected) {
       throw new Error("Product not found");
     }
 
@@ -247,6 +249,10 @@ export const useProductsStore = defineStore("products", () => {
     const productIndex = products.value.findIndex((p) => p.id === id);
     if (productIndex !== -1) {
       products.value.splice(productIndex, 1);
+      total.value = Math.max(0, total.value - 1);
+    } else if (productInSelected) {
+      // Product was in selectedProduct but not in the list
+      // Still decrease total to reflect deletion
       total.value = Math.max(0, total.value - 1);
     }
 
@@ -260,8 +266,11 @@ export const useProductsStore = defineStore("products", () => {
       await productsApi.deleteProduct(id);
     } catch (err) {
       // 4. Restore on error
-      if (productIndex !== -1) {
-        products.value.splice(productIndex, 0, backup);
+      if (productIndex !== -1 && productInList) {
+        products.value.splice(productIndex, 0, productInList);
+        total.value += 1;
+      } else if (productInSelected) {
+        // Restore total if product was only in selectedProduct
         total.value += 1;
       }
       error.value =

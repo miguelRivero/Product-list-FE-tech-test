@@ -99,3 +99,87 @@
     }
   }
 }
+
+// Delete confirmation dialog - matches product-dialog styles
+.delete-confirmation-dialog {
+  .p-dialog-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-gray;
+    background-color: $background;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .p-dialog-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  // Close button styles - same as product-dialog
+  .p-dialog-header-close,
+  .p-dialog-close-button,
+  .p-button.p-dialog-close-button {
+    color: $text-primary;
+    transition: color 0.2s;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline-width: 0 !important;
+    outline-offset: 0 !important;
+
+    &:hover {
+      color: $text-gray-600;
+    }
+
+    &:focus,
+    &:focus-visible,
+    &:focus-within {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline-width: 0 !important;
+      outline-offset: 0 !important;
+    }
+
+    &.p-focus,
+    &.p-button.p-focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline-width: 0 !important;
+      outline-offset: 0 !important;
+    }
+  }
+}
+
+// Delete button style
+.dialog-button-delete {
+  padding: 0.625rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  background-color: $danger;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: darken($danger, 5%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

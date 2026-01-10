@@ -20,7 +20,7 @@
         @clear-error="clearError"
         @view="viewProductHandler"
         @edit="editProductHandler"
-        @delete="confirmDelete"
+        @delete="handleDeleteClick"
         @close-dialog="handleCloseDialog"
         @save-product="handleSaveProduct"
       />
@@ -33,6 +33,19 @@
         @page-change="onPageChange"
       />
     </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <DeleteConfirmationDialog
+      v-if="productToDelete"
+      :visible="showDeleteDialog"
+      :product-title="productToDelete.title"
+      :is-deleting="isDeleting"
+      :error-message="deleteError"
+      :success-message="deleteSuccess"
+      @update:visible="showDeleteDialog = $event"
+      @confirm="handleDeleteConfirm"
+      @cancel="handleDeleteCancel"
+    />
   </div>
 </template>
 
@@ -42,6 +55,7 @@ import ProductsSearch from "@/components/products/ProductsSearch.vue";
 import ProductsToolbar from "@/components/products/ProductsToolbar.vue";
 import ProductsContent from "@/components/products/ProductsContent.vue";
 import ProductListFooter from "@/components/products/ProductListFooter.vue";
+import DeleteConfirmationDialog from "@/components/product/DeleteConfirmationDialog.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
 import { useCategory } from "@/composables/useCategory";
@@ -78,11 +92,7 @@ const { searchQuery } = useSearch((query: string) => {
 });
 
 const { slugToName } = useCategory(categories);
-const {
-  viewProduct,
-  editProduct: getEditProduct,
-  confirmDelete: confirmProductDelete,
-} = useProductActions();
+const { viewProduct, editProduct: getEditProduct } = useProductActions();
 
 const selectedCategoryValue = ref<string | null>(null);
 const showCreateDialog = ref(false);
@@ -91,9 +101,20 @@ const productsContentRef = ref<InstanceType<typeof ProductsContent> | null>(
   null
 );
 
+// Delete dialog state
+const showDeleteDialog = ref(false);
+const productToDelete = ref<Product | null>(null);
+const isDeleting = ref(false);
+const deleteError = ref<string | null>(null);
+const deleteSuccess = ref<string | null>(null);
+
 onMounted(async () => {
   await fetchCategories();
-  await fetchProducts(1, 10);
+  // Only fetch products if the store is empty or we need fresh data
+  // If products were already loaded (e.g., after deleting), use them
+  if (products.value.length === 0) {
+    await fetchProducts(1, 10);
+  }
 });
 
 watch(selectedCategoryValue, (newCategory) => {
@@ -159,8 +180,36 @@ const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
   }
 };
 
-const confirmDelete = (product: Product) => {
-  confirmProductDelete(product, deleteProduct);
+const handleDeleteClick = (product: Product) => {
+  productToDelete.value = product;
+  deleteError.value = null;
+  deleteSuccess.value = null;
+  showDeleteDialog.value = true;
+};
+
+const handleDeleteConfirm = async () => {
+  if (!productToDelete.value) return;
+
+  isDeleting.value = true;
+  deleteError.value = null;
+  deleteSuccess.value = null;
+
+  try {
+    await deleteProduct(productToDelete.value.id);
+    deleteSuccess.value = "Product deleted successfully";
+    // Dialog will auto-close after 1 second (handled in component)
+  } catch (err) {
+    deleteError.value =
+      err instanceof Error ? err.message : "Failed to delete product";
+  } finally {
+    isDeleting.value = false;
+  }
+};
+
+const handleDeleteCancel = () => {
+  productToDelete.value = null;
+  deleteError.value = null;
+  deleteSuccess.value = null;
 };
 </script>
 
