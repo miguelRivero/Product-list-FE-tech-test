@@ -1,5 +1,5 @@
 <template>
-  <div class="products-view">
+  <div class="products-view mb-8">
     <ProductsSearch v-model:searchQuery="searchQuery" />
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +62,11 @@ import { useCategory } from "@/composables/useCategory";
 import { useProductActions } from "@/composables/useProductActions";
 import { useProductsStore } from "@/stores/products";
 import type { Product, ProductFormData } from "@/types/product";
-import { DIALOG_AUTO_CLOSE_DELAY, DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/utils/constants";
+import {
+  DIALOG_AUTO_CLOSE_DELAY,
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+} from "@/utils/constants";
 
 const store = useProductsStore();
 

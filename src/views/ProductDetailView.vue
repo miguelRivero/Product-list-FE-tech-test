@@ -1,5 +1,5 @@
 <template>
-  <div class="product-detail-view">
+  <div class="product-detail-view mb-8">
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
       <p class="loading-text">Loading product...</p>

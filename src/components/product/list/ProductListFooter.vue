@@ -1,5 +1,5 @@
 <template>
-  <div class="product-list-footer mb-8">
+  <div class="product-list-footer">
     <ProductsListInfo
       class="product-list-info"
       :current-page="currentPage"
