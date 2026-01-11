@@ -2,19 +2,38 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useProductsStore } from "./products";
 import { productsApi } from "@/services/api";
-import type { Product, ProductsResponse, Category } from "@/types/product";
+import type { Product, Category } from "@/types/product";
+import { Product as DomainProduct } from "@/domain/product/Product";
 
-// Mock the API service
-vi.mock("@/services/api", () => ({
-  productsApi: {
-    getProducts: vi.fn(),
-    getProduct: vi.fn(),
-    searchProducts: vi.fn(),
-    getCategories: vi.fn(),
-    getProductsByCategory: vi.fn(),
-    createProduct: vi.fn(),
-    updateProduct: vi.fn(),
-    deleteProduct: vi.fn(),
+// Create mock use cases
+const mockGetProductsUseCase = {
+  execute: vi.fn(),
+};
+
+const mockGetProductUseCase = {
+  execute: vi.fn(),
+};
+
+const mockCreateProductUseCase = {
+  execute: vi.fn(),
+};
+
+const mockUpdateProductUseCase = {
+  execute: vi.fn(),
+};
+
+const mockDeleteProductUseCase = {
+  execute: vi.fn(),
+};
+
+// Mock DI container
+vi.mock("@/infrastructure/di/container", () => ({
+  diContainer: {
+    getGetProductsUseCase: () => mockGetProductsUseCase,
+    getGetProductUseCase: () => mockGetProductUseCase,
+    getCreateProductUseCase: () => mockCreateProductUseCase,
+    getUpdateProductUseCase: () => mockUpdateProductUseCase,
+    getDeleteProductUseCase: () => mockDeleteProductUseCase,
   },
 }));
 
@@ -46,6 +65,32 @@ vi.mock("@/utils/idGenerator", () => ({
   isClientGeneratedId: vi.fn((id: number) => id >= 10000 && id < 100000),
 }));
 
+// Mock API (still needed for categories)
+vi.mock("@/services/api", () => ({
+  productsApi: {
+    getCategories: vi.fn(),
+  },
+}));
+
+// Helper function to create domain product from API product data
+function createDomainProductFromApiData(apiProduct: Partial<Product>): DomainProduct {
+  return DomainProduct.fromDTO({
+    id: apiProduct.id!,
+    title: apiProduct.title!,
+    description: apiProduct.description || "",
+    category: apiProduct.category!,
+    price: apiProduct.price!,
+    discountPercentage: apiProduct.discountPercentage || 0,
+    stock: apiProduct.stock!,
+    rating: apiProduct.rating || 0,
+    images: apiProduct.images || [],
+    thumbnail: apiProduct.thumbnail || "",
+    tags: apiProduct.tags || [],
+    brand: apiProduct.brand,
+    sku: apiProduct.sku,
+  });
+}
+
 describe("Products Store", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -67,15 +112,13 @@ describe("Products Store", () => {
   it("computes totalPages correctly", async () => {
     const store = useProductsStore();
 
-    // Mock API response
-    const mockResponse: ProductsResponse = {
+    // Mock use case response
+    mockGetProductsUseCase.execute.mockResolvedValue({
       products: [],
       total: 25,
-      skip: 0,
+      page: 1,
       limit: 10,
-    };
-
-    vi.mocked(productsApi.getProducts).mockResolvedValue(mockResponse);
+    });
 
     await store.fetchProducts(1, 10);
 
@@ -85,7 +128,7 @@ describe("Products Store", () => {
   it("fetches products successfully", async () => {
     const store = useProductsStore();
 
-    const mockProducts: Product[] = [
+    const mockApiProducts: Product[] = [
       {
         id: 1,
         title: "Test Product 1",
@@ -112,14 +155,16 @@ describe("Products Store", () => {
       },
     ];
 
-    const mockResponse: ProductsResponse = {
-      products: mockProducts,
-      total: 2,
-      skip: 0,
-      limit: 10,
-    };
+    // Convert to domain entities
+    const domainProducts = mockApiProducts.map(createDomainProductFromApiData);
 
-    vi.mocked(productsApi.getProducts).mockResolvedValue(mockResponse);
+    // Mock use case response
+    mockGetProductsUseCase.execute.mockResolvedValue({
+      products: domainProducts,
+      total: 2,
+      page: 1,
+      limit: 10,
+    });
 
     await store.fetchProducts(1, 10);
 
@@ -135,9 +180,7 @@ describe("Products Store", () => {
     const store = useProductsStore();
 
     const errorMessage = "Network error";
-    vi.mocked(productsApi.getProducts).mockRejectedValue(
-      new Error(errorMessage)
-    );
+    mockGetProductsUseCase.execute.mockRejectedValue(new Error(errorMessage));
 
     await store.fetchProducts(1, 10);
 
@@ -149,14 +192,12 @@ describe("Products Store", () => {
   it("computes hasNextPage and hasPrevPage correctly", async () => {
     const store = useProductsStore();
 
-    const mockResponse: ProductsResponse = {
+    mockGetProductsUseCase.execute.mockResolvedValue({
       products: [],
       total: 25,
-      skip: 0,
+      page: 1,
       limit: 10,
-    };
-
-    vi.mocked(productsApi.getProducts).mockResolvedValue(mockResponse);
+    });
 
     // Page 1
     await store.fetchProducts(1, 10);
@@ -164,11 +205,23 @@ describe("Products Store", () => {
     expect(store.hasPrevPage).toBe(false);
 
     // Page 2
+    mockGetProductsUseCase.execute.mockResolvedValue({
+      products: [],
+      total: 25,
+      page: 2,
+      limit: 10,
+    });
     await store.fetchProducts(2, 10);
     expect(store.hasNextPage).toBe(true);
     expect(store.hasPrevPage).toBe(true);
 
     // Page 3 (last page)
+    mockGetProductsUseCase.execute.mockResolvedValue({
+      products: [],
+      total: 25,
+      page: 3,
+      limit: 10,
+    });
     await store.fetchProducts(3, 10);
     expect(store.hasNextPage).toBe(false);
     expect(store.hasPrevPage).toBe(true);
@@ -192,47 +245,33 @@ describe("Products Store", () => {
   it("sets search query and refetches products", async () => {
     const store = useProductsStore();
 
-    const mockResponse: ProductsResponse = {
+    mockGetProductsUseCase.execute.mockResolvedValue({
       products: [],
       total: 0,
-      skip: 0,
+      page: 1,
       limit: 10,
-    };
-
-    vi.mocked(productsApi.searchProducts).mockResolvedValue(mockResponse);
+    });
 
     await store.setSearchQuery("test query");
 
     expect(store.searchQuery).toBe("test query");
-    expect(productsApi.searchProducts).toHaveBeenCalledWith(
-      "test query",
-      10,
-      0
-    );
+    expect(mockGetProductsUseCase.execute).toHaveBeenCalledWith(1, 10, undefined, "test query");
   });
 
   it("sets selected category and refetches products", async () => {
     const store = useProductsStore();
 
-    const mockResponse: ProductsResponse = {
+    mockGetProductsUseCase.execute.mockResolvedValue({
       products: [],
       total: 0,
-      skip: 0,
+      page: 1,
       limit: 10,
-    };
-
-    vi.mocked(productsApi.getProductsByCategory).mockResolvedValue(
-      mockResponse
-    );
+    });
 
     await store.setSelectedCategory("electronics");
 
     expect(store.selectedCategory).toBe("electronics");
-    expect(productsApi.getProductsByCategory).toHaveBeenCalledWith(
-      "electronics",
-      10,
-      0
-    );
+    expect(mockGetProductsUseCase.execute).toHaveBeenCalledWith(1, 10, "electronics", undefined);
   });
 
   it("resets store state", () => {
@@ -279,15 +318,16 @@ describe("Products Store", () => {
       category: "electronics",
     };
 
-    const mockApiResponse: Product = {
-      id: 195,
+    const mockApiProduct: Product = {
+      id: 15000,
       ...mockProductData,
       rating: 0,
       images: [],
       thumbnail: "",
     };
 
-    vi.mocked(productsApi.createProduct).mockResolvedValue(mockApiResponse);
+    const domainProduct = createDomainProductFromApiData(mockApiProduct);
+    mockCreateProductUseCase.execute.mockResolvedValue(domainProduct);
 
     const result = await store.createProduct(mockProductData);
 
@@ -321,10 +361,12 @@ describe("Products Store", () => {
       price: 150,
     };
 
-    vi.mocked(productsApi.updateProduct).mockResolvedValue({
+    const updatedDomainProduct = createDomainProductFromApiData({
       ...existingProduct,
       ...updates,
     });
+
+    mockUpdateProductUseCase.execute.mockResolvedValue(updatedDomainProduct);
 
     const result = await store.updateProduct(1, updates);
 
@@ -334,7 +376,7 @@ describe("Products Store", () => {
     expect(store.products[0].price).toBe(150);
   });
 
-  it("skips API call for client-created products when updating", async () => {
+  it("skips use case call for client-created products when updating", async () => {
     const store = useProductsStore();
 
     const clientProduct: Product = {
@@ -359,7 +401,9 @@ describe("Products Store", () => {
     const result = await store.updateProduct(15000, updates);
 
     expect(result.title).toBe("Updated");
-    expect(productsApi.updateProduct).not.toHaveBeenCalled();
+    // Use case is NOT called for client-created products (optimistic update only)
+    expect(mockUpdateProductUseCase.execute).not.toHaveBeenCalled();
+    expect(store.products[0].title).toBe("Updated");
   });
 
   it("deletes product successfully", async () => {
@@ -394,14 +438,14 @@ describe("Products Store", () => {
     store.products = [product1, product2];
     store.total = 2;
 
-    vi.mocked(productsApi.deleteProduct).mockResolvedValue(product1);
+    mockDeleteProductUseCase.execute.mockResolvedValue(undefined);
 
     await store.deleteProduct(1);
 
     expect(store.products.length).toBe(1);
     expect(store.products[0].id).toBe(2);
     expect(store.total).toBe(1);
-    expect(productsApi.deleteProduct).toHaveBeenCalledWith(1);
+    expect(mockDeleteProductUseCase.execute).toHaveBeenCalled();
   });
 
   it("restores product on delete error", async () => {
@@ -423,7 +467,7 @@ describe("Products Store", () => {
     store.products = [product];
     store.total = 1;
 
-    vi.mocked(productsApi.deleteProduct).mockRejectedValue(new Error("Delete failed"));
+    mockDeleteProductUseCase.execute.mockRejectedValue(new Error("Delete failed"));
 
     await expect(store.deleteProduct(1)).rejects.toThrow("Delete failed");
 
@@ -431,4 +475,3 @@ describe("Products Store", () => {
     expect(store.total).toBe(1);
   });
 });
-

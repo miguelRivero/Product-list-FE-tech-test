@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "playwright/test";
 
 test.describe("Product CRUD Operations", () => {
   test.beforeEach(async ({ page }) => {
@@ -33,32 +33,34 @@ test.describe("Product CRUD Operations", () => {
     // Fill form
     await page.getByTestId("product-title-input").fill("E2E Test Product");
     await page.getByTestId("product-description-input").fill("This is a test product created by E2E tests");
-    await page.getByTestId("product-price-input").fill("99.99");
-    await page.getByTestId("product-stock-input").fill("50");
+    
+    // For InputNumber fields, use the nested input element
+    const priceInput = page.getByTestId("product-price-input").locator("input");
+    await priceInput.click();
+    await priceInput.fill("99.99");
+    
+    const stockInput = page.getByTestId("product-stock-input").locator("input");
+    await stockInput.click();
+    await stockInput.fill("50");
 
-    // Select category - wait for categories to load and select first available
-    await page.waitForTimeout(500);
+    // Select category - more robust approach
     const categorySelect = page.getByTestId("product-category-select");
     await categorySelect.click();
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(300); // Wait for dropdown to open
     
-    // Get first category option
-    const categoryOptions = page.getByRole("option");
-    const firstOption = categoryOptions.first();
-    if (await firstOption.isVisible({ timeout: 2000 })) {
-      await firstOption.click();
-    }
+    // Wait for options to be visible and click first one
+    const firstOption = page.locator('[role="option"]').first();
+    await expect(firstOption).toBeVisible({ timeout: 2000 });
+    await firstOption.click();
 
     // Submit form
-    const saveButton = dialog.getByRole("button", { name: /save/i });
+    const saveButton = dialog.getByRole("button", { name: /^save$/i });
     await saveButton.click();
 
-    // Wait for success message or dialog to close
-    await expect(
-      dialog.getByText(/success|created/i).or(dialog.locator(":not([style*='display: none'])").filter({ hasText: /success/i }))
-    ).toBeVisible({ timeout: 5000 }).catch(() => {
-      // Dialog might close automatically, check if product appears in list
-      return page.waitForSelector("text=E2E Test Product", { timeout: 3000 });
-    });
+    // Wait for dialog to close
+    await expect(dialog).toBeHidden({ timeout: 10000 });
+    
+    // Verify product appears in list
+    await expect(page.getByText("E2E Test Product")).toBeVisible({ timeout: 5000 });
   });
 });
