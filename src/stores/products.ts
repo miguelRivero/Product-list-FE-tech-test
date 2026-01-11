@@ -2,19 +2,19 @@ import type {
   Category,
   Product,
   ProductFormData,
-  ProductsResponse,
 } from "@/types/product";
 import { computed, ref } from "vue";
-
 import { defineStore } from "pinia";
 import { productsApi } from "@/services/api";
 import { logger } from "@/utils/logger";
 import { generateSecureClientId, isClientGeneratedId } from "@/utils/idGenerator";
 import { apiCache } from "@/utils/apiCache";
 import { CACHE_TTL } from "@/utils/constants";
+import { diContainer } from "@/infrastructure/di/container";
+import { domainProductToApiProduct } from "./productsAdapter";
 
 export const useProductsStore = defineStore("products", () => {
-  // State
+  // State (using API Product type for component compatibility)
   const products = ref<Product[]>([]);
   const total = ref(0);
   const loading = ref(false);
@@ -34,6 +34,7 @@ export const useProductsStore = defineStore("products", () => {
   // Actions
   /**
    * Fetch products with pagination
+   * Uses GetProductsUseCase internally
    */
   async function fetchProducts(page = 1, limit = 10) {
     loading.value = true;
@@ -42,61 +43,17 @@ export const useProductsStore = defineStore("products", () => {
     pageSize.value = limit;
 
     try {
-      let response: ProductsResponse;
-      const skip = (page - 1) * limit;
-      const cacheParams = { page, limit, skip, search: searchQuery.value, category: selectedCategory.value };
+      const useCase = diContainer.getGetProductsUseCase();
+      const result = await useCase.execute(
+        page,
+        limit,
+        selectedCategory.value || undefined,
+        searchQuery.value || undefined
+      );
 
-      if (searchQuery.value) {
-        // Check cache first
-        const cacheKey = `/products/search`;
-        const cached = apiCache.get<ProductsResponse>(cacheKey, cacheParams);
-        if (cached) {
-          response = cached;
-          logger.debug("Using cached search results", { query: searchQuery.value });
-        } else {
-          // Search products
-          response = await productsApi.searchProducts(
-            searchQuery.value,
-            limit,
-            skip
-          );
-          // Cache for 1 minute (search results change frequently)
-          apiCache.set(cacheKey, response, cacheParams, CACHE_TTL.SEARCH_RESULTS);
-        }
-      } else if (selectedCategory.value) {
-        // Check cache first
-        const cacheKey = `/products/category/${selectedCategory.value}`;
-        const cached = apiCache.get<ProductsResponse>(cacheKey, cacheParams);
-        if (cached) {
-          response = cached;
-          logger.debug("Using cached category results", { category: selectedCategory.value });
-        } else {
-          // Filter by category
-          response = await productsApi.getProductsByCategory(
-            selectedCategory.value,
-            limit,
-            skip
-          );
-          // Cache for 5 minutes
-          apiCache.set(cacheKey, response, cacheParams, CACHE_TTL.PRODUCTS_LIST);
-        }
-      } else {
-        // Check cache first
-        const cacheKey = `/products`;
-        const cached = apiCache.get<ProductsResponse>(cacheKey, cacheParams);
-        if (cached) {
-          response = cached;
-          logger.debug("Using cached products");
-        } else {
-          // Get all products
-          response = await productsApi.getProducts(limit, skip);
-          // Cache for 5 minutes
-          apiCache.set(cacheKey, response, cacheParams, CACHE_TTL.PRODUCTS_LIST);
-        }
-      }
-
-      products.value = response.products;
-      total.value = response.total;
+      // Convert domain entities to API Product type for component compatibility
+      products.value = result.products.map(domainProductToApiProduct);
+      total.value = result.total;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch products";
       error.value = errorMessage;
@@ -113,6 +70,7 @@ export const useProductsStore = defineStore("products", () => {
 
   /**
    * Fetch single product by ID
+   * Uses GetProductUseCase internally
    */
   async function fetchProduct(id: number) {
     loading.value = true;
@@ -126,9 +84,12 @@ export const useProductsStore = defineStore("products", () => {
         selectedProduct.value = cached;
         logger.debug("Using cached product", { id });
       } else {
-        selectedProduct.value = await productsApi.getProduct(id);
-        // Cache for 10 minutes (product details don't change often)
-        apiCache.set(cacheKey, selectedProduct.value, undefined, CACHE_TTL.PRODUCT_DETAIL);
+        const useCase = diContainer.getGetProductUseCase();
+        const domainProduct = await useCase.execute(id);
+        const apiProduct = domainProductToApiProduct(domainProduct);
+        selectedProduct.value = apiProduct;
+        // Cache for 10 minutes
+        apiCache.set(cacheKey, apiProduct, undefined, CACHE_TTL.PRODUCT_DETAIL);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch product";
@@ -141,6 +102,7 @@ export const useProductsStore = defineStore("products", () => {
 
   /**
    * Fetch all categories
+   * Categories are not part of domain model, so we use API directly
    */
   async function fetchCategories() {
     try {
@@ -178,40 +140,39 @@ export const useProductsStore = defineStore("products", () => {
 
   /**
    * Create a new product
+   * Uses CreateProductUseCase internally
    * Uses optimistic update pattern since DummyJSON doesn't persist
    */
-
   async function createProduct(productData: ProductFormData): Promise<Product> {
-    try {
-      // 1. Call API (returns fake success from DummyJSON)
-      const response = await productsApi.createProduct(productData);
+    loading.value = true;
+    error.value = null;
 
-      // 2. Generate secure client-side ID
+    try {
+      // Generate secure client-side ID
       const clientId = generateSecureClientId();
 
-      // 3. Create placeholder image (SVG data URI)
-      const placeholderImage =
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23e2e2e2' width='300' height='200'/%3E%3Ctext fill='%236b7280' font-family='sans-serif' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+      // Use case handles domain logic and validation
+      const useCase = diContainer.getCreateProductUseCase();
+      const domainProduct = await useCase.execute(productData, clientId);
 
-      // 4. Create product with client-side ID
-      const newProduct: Product = {
-        ...response,
-        id: clientId,
-        thumbnail: response.thumbnail || placeholderImage,
-        images:
-          response.images && response.images.length > 0
-            ? response.images
-            : [placeholderImage],
-        rating: response.rating || 0,
-        discountPercentage: response.discountPercentage || 0,
-        tags: productData.tags || [],
-      };
+      // Convert to API Product type
+      const newProduct = domainProductToApiProduct(domainProduct);
 
-      // 5. Add to local state immediately (optimistic update) - at the top of the list
+      // Add placeholder image if needed (handled in use case, but ensure it's set)
+      if (!newProduct.thumbnail) {
+        const placeholderImage =
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23e2e2e2' width='300' height='200'/%3E%3Ctext fill='%236b7280' font-family='sans-serif' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+        newProduct.thumbnail = placeholderImage;
+        if (newProduct.images.length === 0) {
+          newProduct.images = [placeholderImage];
+        }
+      }
+
+      // Optimistic update - add to local state immediately
       products.value.unshift(newProduct);
       total.value += 1;
 
-      // 6. Invalidate product list cache since we added a new product
+      // Invalidate product list cache
       apiCache.invalidatePattern("^/products");
 
       logger.info("Product created successfully", { id: clientId, title: productData.title });
@@ -224,26 +185,37 @@ export const useProductsStore = defineStore("products", () => {
         productData,
       });
       throw err;
+    } finally {
+      loading.value = false;
     }
   }
 
   /**
    * Update an existing product
+   * Uses UpdateProductUseCase internally
    * Uses optimistic update pattern since DummyJSON doesn't persist
    */
   async function updateProduct(
     id: number,
     updates: Partial<ProductFormData>
   ): Promise<Product> {
-    // 1. Backup current state - check both products array and selectedProduct
+    loading.value = true;
+    error.value = null;
+
+    // Backup current state for rollback
     const originalProduct =
       products.value.find((p) => p.id === id) || selectedProduct.value;
 
     if (!originalProduct || originalProduct.id !== id) {
+      error.value = "Product not found";
+      loading.value = false;
       throw new Error("Product not found");
     }
 
-    // 2. Optimistic update - update UI immediately
+    // Check if product is client-side created
+    const isClientCreated = isClientGeneratedId(id);
+
+    // Optimistic update - update UI immediately
     const productIndex = products.value.findIndex((p) => p.id === id);
     if (productIndex !== -1) {
       products.value[productIndex] = {
@@ -260,11 +232,9 @@ export const useProductsStore = defineStore("products", () => {
       } as Product;
     }
 
-    // 3. Check if product is client-side created
-    const isClientCreated = isClientGeneratedId(id);
-
     if (isClientCreated) {
       // Product was created locally, just return updated product without API call
+      loading.value = false;
       if (productIndex !== -1) {
         return products.value[productIndex] as Product;
       }
@@ -272,22 +242,30 @@ export const useProductsStore = defineStore("products", () => {
     }
 
     try {
-      // 4. Call API in background (fake response from DummyJSON) only for real products
-      await productsApi.updateProduct(id, updates);
+      // Use case handles domain logic
+      const useCase = diContainer.getUpdateProductUseCase();
+      const domainProduct = await useCase.execute(id, updates);
 
-      // Invalidate caches for this product and product list
+      // Convert to API Product type
+      const updatedProduct = domainProductToApiProduct(domainProduct);
+
+      // Update state with the actual updated product
+      if (productIndex !== -1) {
+        products.value[productIndex] = updatedProduct;
+      }
+      if (selectedProduct.value?.id === id) {
+        selectedProduct.value = updatedProduct;
+      }
+
+      // Invalidate caches
       apiCache.invalidate(`/products/${id}`);
       apiCache.invalidatePattern("^/products");
 
       logger.info("Product updated successfully", { id, updates });
 
-      // Return the updated product
-      if (productIndex !== -1) {
-        return products.value[productIndex] as Product;
-      }
-      return selectedProduct.value as Product;
+      return updatedProduct;
     } catch (err) {
-      // 5. Rollback on error
+      // Rollback on error
       if (productIndex !== -1 && originalProduct) {
         products.value[productIndex] = originalProduct;
       }
@@ -301,30 +279,36 @@ export const useProductsStore = defineStore("products", () => {
         updates,
       });
       throw err;
+    } finally {
+      loading.value = false;
     }
   }
 
   /**
    * Delete a product
+   * Uses DeleteProductUseCase internally
    * Uses optimistic update pattern since DummyJSON doesn't persist
    */
   async function deleteProduct(id: number): Promise<void> {
-    // 1. Backup current state - check both products array and selectedProduct
+    loading.value = true;
+    error.value = null;
+
+    // Backup current state for rollback
     const productInList = products.value.find((p) => p.id === id);
     const productInSelected = selectedProduct.value?.id === id ? selectedProduct.value : null;
 
     if (!productInList && !productInSelected) {
+      error.value = "Product not found";
+      loading.value = false;
       throw new Error("Product not found");
     }
 
-    // 2. Remove from UI immediately (optimistic update)
+    // Optimistic update - remove from UI immediately
     const productIndex = products.value.findIndex((p) => p.id === id);
     if (productIndex !== -1) {
       products.value.splice(productIndex, 1);
       total.value = Math.max(0, total.value - 1);
     } else if (productInSelected) {
-      // Product was in selectedProduct but not in the list
-      // Still decrease total to reflect deletion
       total.value = Math.max(0, total.value - 1);
     }
 
@@ -334,27 +318,29 @@ export const useProductsStore = defineStore("products", () => {
     }
 
     try {
-      // 3. Call API in background (fake response from DummyJSON)
-      await productsApi.deleteProduct(id);
+      // Use case handles domain logic
+      const useCase = diContainer.getDeleteProductUseCase();
+      await useCase.execute(id);
 
-      // 4. Invalidate caches
+      // Invalidate caches
       apiCache.invalidate(`/products/${id}`);
       apiCache.invalidatePattern("^/products");
 
       logger.info("Product deleted successfully", { id });
     } catch (err) {
-      // 5. Restore on error
+      // Restore on error
       if (productIndex !== -1 && productInList) {
         products.value.splice(productIndex, 0, productInList);
         total.value += 1;
       } else if (productInSelected) {
-        // Restore total if product was only in selectedProduct
         total.value += 1;
       }
       const errorMessage = err instanceof Error ? err.message : "Failed to delete product";
       error.value = errorMessage;
       logger.error("Error deleting product", err instanceof Error ? err : new Error(errorMessage), { id });
       throw err;
+    } finally {
+      loading.value = false;
     }
   }
 
