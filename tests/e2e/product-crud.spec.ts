@@ -46,7 +46,6 @@ test.describe("Product CRUD Operations", () => {
     // Select category - more robust approach
     const categorySelect = page.getByTestId("product-category-select");
     await categorySelect.click();
-    await page.waitForTimeout(300); // Wait for dropdown to open
     
     // Wait for options to be visible and click first one
     const firstOption = page.locator('[role="option"]').first();

@@ -4,6 +4,7 @@ import type {
   ProductFormData,
   ProductsResponse,
 } from "@/types/product";
+import type { ApiErrorData } from "@/types/api";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { logger } from "@/utils/logger";
 
@@ -29,10 +30,10 @@ const api: AxiosInstance = axios.create({
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
+  (error: AxiosError<ApiErrorData>) => {
     // Global error handler
     const message =
-      (error.response?.data as { message?: string })?.message ||
+      error.response?.data?.message ||
       error.message ||
       "Unknown error";
 

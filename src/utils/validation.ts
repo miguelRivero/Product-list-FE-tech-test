@@ -34,7 +34,11 @@ export const productFormSchema = z.object({
     .min(1, "Category is required")
     .trim(),
   brand: z.string().max(100, "Brand must be 100 characters or less").trim().optional(),
-  tags: z.array(z.string().trim()).optional().default([]),
+  tags: z
+    .array(z.string().trim())
+    .max(50, "Maximum 50 tags allowed")
+    .optional()
+    .default([]),
 });
 
 // ProductFormData type is defined in @/types/product

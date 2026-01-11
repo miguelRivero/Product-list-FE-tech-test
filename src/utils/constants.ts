@@ -18,3 +18,15 @@ export const CLIENT_ID_RANGE = {
   MIN: 10000,
   MAX: 99999,
 };
+
+// Search debounce delay (in milliseconds)
+export const SEARCH_DEBOUNCE_DELAY = 300;
+
+// Search state reset delay (in milliseconds)
+export const SEARCH_STATE_RESET_DELAY = 100;
+
+// Default page size for products
+export const DEFAULT_PAGE_SIZE = 10;
+
+// Default page number
+export const DEFAULT_PAGE = 1;

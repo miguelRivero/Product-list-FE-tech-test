@@ -4,6 +4,7 @@ import { useProductsStore } from "./products";
 import { productsApi } from "@/services/api";
 import type { Product, Category } from "@/types/product";
 import { Product as DomainProduct } from "@/domain/product/Product";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/utils/constants";
 
 // Create mock use cases
 const mockGetProductsUseCase = {
@@ -120,7 +121,7 @@ describe("Products Store", () => {
       limit: 10,
     });
 
-    await store.fetchProducts(1, 10);
+    await store.fetchProducts(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
 
     expect(store.totalPages).toBe(3); // Math.ceil(25/10) = 3
   });
@@ -166,7 +167,7 @@ describe("Products Store", () => {
       limit: 10,
     });
 
-    await store.fetchProducts(1, 10);
+    await store.fetchProducts(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
 
     expect(store.products).toHaveLength(2);
     expect(store.products[0].title).toBe("Test Product 1");
@@ -182,7 +183,7 @@ describe("Products Store", () => {
     const errorMessage = "Network error";
     mockGetProductsUseCase.execute.mockRejectedValue(new Error(errorMessage));
 
-    await store.fetchProducts(1, 10);
+    await store.fetchProducts(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
 
     expect(store.products).toEqual([]);
     expect(store.loading).toBe(false);
@@ -200,7 +201,7 @@ describe("Products Store", () => {
     });
 
     // Page 1
-    await store.fetchProducts(1, 10);
+    await store.fetchProducts(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
     expect(store.hasNextPage).toBe(true);
     expect(store.hasPrevPage).toBe(false);
 

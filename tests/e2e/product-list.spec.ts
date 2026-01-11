@@ -20,11 +20,11 @@ test.describe("Product List", () => {
     const searchInput = page.getByPlaceholder(/search/i);
     await searchInput.fill("phone");
 
-    // Wait for debounce and API call
-    await page.waitForTimeout(1000);
-    
-    // Wait for table to update
+    // Wait for table to update after debounce and API call
     await page.waitForSelector('[data-testid="products-table"]', { state: "visible" });
+    
+    // Wait for products to be loaded (ensure API call completed)
+    await page.waitForLoadState("networkidle");
 
     const rows = page.getByTestId("product-row");
     const count = await rows.count();

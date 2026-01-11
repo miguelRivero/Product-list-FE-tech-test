@@ -62,7 +62,7 @@ import { useCategory } from "@/composables/useCategory";
 import { useProductActions } from "@/composables/useProductActions";
 import { useProductsStore } from "@/stores/products";
 import type { Product, ProductFormData } from "@/types/product";
-import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";
+import { DIALOG_AUTO_CLOSE_DELAY, DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/utils/constants";
 
 const store = useProductsStore();
 
@@ -114,7 +114,7 @@ onMounted(async () => {
   // Only fetch products if the store is empty or we need fresh data
   // If products were already loaded (e.g., after deleting), use them
   if (products.value.length === 0) {
-    await fetchProducts(1, 10);
+    await fetchProducts(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
   }
 });
 

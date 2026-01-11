@@ -1,17 +1,17 @@
-import type {
-  Category,
-  Product,
-  ProductFormData,
-} from "@/types/product";
+import { CACHE_TTL, DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/utils/constants";
+import type { Category, Product, ProductFormData } from "@/types/product";
 import { computed, ref } from "vue";
-import { defineStore } from "pinia";
-import { productsApi } from "@/services/api";
-import { logger } from "@/utils/logger";
-import { generateSecureClientId, isClientGeneratedId } from "@/utils/idGenerator";
+import {
+  generateSecureClientId,
+  isClientGeneratedId,
+} from "@/utils/idGenerator";
+
 import { apiCache } from "@/utils/apiCache";
-import { CACHE_TTL } from "@/utils/constants";
+import { defineStore } from "pinia";
 import { diContainer } from "@/infrastructure/di/container";
 import { domainProductToApiProduct } from "./productsAdapter";
+import { logger } from "@/utils/logger";
+import { productsApi } from "@/services/api";
 
 export const useProductsStore = defineStore("products", () => {
   // State (using API Product type for component compatibility)
@@ -22,8 +22,8 @@ export const useProductsStore = defineStore("products", () => {
   const selectedProduct = ref<Product | null>(null);
   const categories = ref<Category[]>([]);
   const selectedCategory = ref<string | null>(null);
-  const currentPage = ref(1);
-  const pageSize = ref(10);
+  const currentPage = ref(DEFAULT_PAGE);
+  const pageSize = ref(DEFAULT_PAGE_SIZE);
   const searchQuery = ref("");
 
   // Getters
@@ -36,7 +36,7 @@ export const useProductsStore = defineStore("products", () => {
    * Fetch products with pagination
    * Uses GetProductsUseCase internally
    */
-  async function fetchProducts(page = 1, limit = 10) {
+  async function fetchProducts(page = DEFAULT_PAGE, limit = DEFAULT_PAGE_SIZE) {
     loading.value = true;
     error.value = null;
     currentPage.value = page;
@@ -55,14 +55,19 @@ export const useProductsStore = defineStore("products", () => {
       products.value = result.products.map(domainProductToApiProduct);
       total.value = result.total;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch products";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch products";
       error.value = errorMessage;
-      logger.error("Error fetching products", err instanceof Error ? err : new Error(errorMessage), {
-        page,
-        limit,
-        searchQuery: searchQuery.value,
-        category: selectedCategory.value,
-      });
+      logger.error(
+        "Error fetching products",
+        err instanceof Error ? err : new Error(errorMessage),
+        {
+          page,
+          limit,
+          searchQuery: searchQuery.value,
+          category: selectedCategory.value,
+        }
+      );
     } finally {
       loading.value = false;
     }
@@ -92,9 +97,14 @@ export const useProductsStore = defineStore("products", () => {
         apiCache.set(cacheKey, apiProduct, undefined, CACHE_TTL.PRODUCT_DETAIL);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch product";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch product";
       error.value = errorMessage;
-      logger.error("Error fetching product", err instanceof Error ? err : new Error(errorMessage), { id });
+      logger.error(
+        "Error fetching product",
+        err instanceof Error ? err : new Error(errorMessage),
+        { id }
+      );
     } finally {
       loading.value = false;
     }
@@ -115,10 +125,18 @@ export const useProductsStore = defineStore("products", () => {
       } else {
         categories.value = await productsApi.getCategories();
         // Cache for 1 hour (categories rarely change)
-        apiCache.set(cacheKey, categories.value, undefined, CACHE_TTL.CATEGORIES);
+        apiCache.set(
+          cacheKey,
+          categories.value,
+          undefined,
+          CACHE_TTL.CATEGORIES
+        );
       }
     } catch (err) {
-      logger.error("Error fetching categories", err instanceof Error ? err : new Error("Unknown error"));
+      logger.error(
+        "Error fetching categories",
+        err instanceof Error ? err : new Error("Unknown error")
+      );
     }
   }
 
@@ -175,15 +193,23 @@ export const useProductsStore = defineStore("products", () => {
       // Invalidate product list cache
       apiCache.invalidatePattern("^/products");
 
-      logger.info("Product created successfully", { id: clientId, title: productData.title });
+      logger.info("Product created successfully", {
+        id: clientId,
+        title: productData.title,
+      });
 
       return newProduct;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create product";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create product";
       error.value = errorMessage;
-      logger.error("Error creating product", err instanceof Error ? err : new Error(errorMessage), {
-        productData,
-      });
+      logger.error(
+        "Error creating product",
+        err instanceof Error ? err : new Error(errorMessage),
+        {
+          productData,
+        }
+      );
       throw err;
     } finally {
       loading.value = false;
@@ -204,7 +230,7 @@ export const useProductsStore = defineStore("products", () => {
 
     // Backup current state for rollback
     const originalProduct =
-      products.value.find((p) => p.id === id) || selectedProduct.value;
+      products.value.find(p => p.id === id) || selectedProduct.value;
 
     if (!originalProduct || originalProduct.id !== id) {
       error.value = "Product not found";
@@ -216,7 +242,7 @@ export const useProductsStore = defineStore("products", () => {
     const isClientCreated = isClientGeneratedId(id);
 
     // Optimistic update - update UI immediately
-    const productIndex = products.value.findIndex((p) => p.id === id);
+    const productIndex = products.value.findIndex(p => p.id === id);
     if (productIndex !== -1) {
       products.value[productIndex] = {
         ...products.value[productIndex],
@@ -272,12 +298,17 @@ export const useProductsStore = defineStore("products", () => {
       if (selectedProduct.value?.id === id && originalProduct) {
         selectedProduct.value = originalProduct;
       }
-      const errorMessage = err instanceof Error ? err.message : "Failed to update product";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update product";
       error.value = errorMessage;
-      logger.error("Error updating product", err instanceof Error ? err : new Error(errorMessage), {
-        id,
-        updates,
-      });
+      logger.error(
+        "Error updating product",
+        err instanceof Error ? err : new Error(errorMessage),
+        {
+          id,
+          updates,
+        }
+      );
       throw err;
     } finally {
       loading.value = false;
@@ -294,8 +325,9 @@ export const useProductsStore = defineStore("products", () => {
     error.value = null;
 
     // Backup current state for rollback
-    const productInList = products.value.find((p) => p.id === id);
-    const productInSelected = selectedProduct.value?.id === id ? selectedProduct.value : null;
+    const productInList = products.value.find(p => p.id === id);
+    const productInSelected =
+      selectedProduct.value?.id === id ? selectedProduct.value : null;
 
     if (!productInList && !productInSelected) {
       error.value = "Product not found";
@@ -304,7 +336,7 @@ export const useProductsStore = defineStore("products", () => {
     }
 
     // Optimistic update - remove from UI immediately
-    const productIndex = products.value.findIndex((p) => p.id === id);
+    const productIndex = products.value.findIndex(p => p.id === id);
     if (productIndex !== -1) {
       products.value.splice(productIndex, 1);
       total.value = Math.max(0, total.value - 1);
@@ -335,9 +367,14 @@ export const useProductsStore = defineStore("products", () => {
       } else if (productInSelected) {
         total.value += 1;
       }
-      const errorMessage = err instanceof Error ? err.message : "Failed to delete product";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete product";
       error.value = errorMessage;
-      logger.error("Error deleting product", err instanceof Error ? err : new Error(errorMessage), { id });
+      logger.error(
+        "Error deleting product",
+        err instanceof Error ? err : new Error(errorMessage),
+        { id }
+      );
       throw err;
     } finally {
       loading.value = false;
