@@ -60,54 +60,11 @@ pnpm test:e2e:ui
 
 ## API Configuration
 
-The application supports both direct DummyJSON API calls and a Backend for Frontend (BFF) pattern.
+The application calls DummyJSON API directly from the frontend.
 
-### Default Configuration (DummyJSON)
+**Base URL**: `https://dummyjson.com`
 
-By default, the app calls DummyJSON API directly:
-
-```bash
-# No environment variables needed
-# API calls go to: https://dummyjson.com
-```
-
-### BFF Configuration
-
-To use a BFF layer, set the environment variable:
-
-```bash
-# .env file
-VITE_BFF_URL=http://localhost:3000/api
-# or
-VITE_API_BASE_URL=http://localhost:3000/api
-```
-
-**Priority**: `VITE_BFF_URL` > `VITE_API_BASE_URL` > default DummyJSON
-
-### API Timeout Configuration
-
-The API timeout is configurable via environment variable:
-
-```bash
-# .env file (optional, default: 10000ms)
-VITE_API_TIMEOUT=15000
-```
-
-### Environment Variables
-
-Create a `.env` file in the root directory (see `.env.example` for reference):
-
-```bash
-# API Configuration
-VITE_BFF_URL=https://dummyjson.com
-# or
-VITE_API_BASE_URL=http://localhost:3000/api
-
-# API Timeout (optional, default: 10000ms)
-VITE_API_TIMEOUT=15000
-```
-
-See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) and [docs/API.md](./docs/API.md) for more details on the BFF approach.
+**Note**: DummyJSON does NOT persist POST/PUT/DELETE operations. The application simulates persistence using optimistic updates in the Pinia store.
 
 ## Architecture
 
@@ -135,7 +92,8 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 - [Architecture Decisions](./docs/ARCHITECTURE.md)
 - [API Documentation](./docs/API.md)
 - [Testing Strategy](./docs/TESTING.md)
-- [Technical Decisions](./TECHNICAL_DECISIONS.md)
+- [DDD Implementation](./docs/DDD_IMPLEMENTATION.md)
+- [Agents Guide](./docs/agents.md)
 
 ## Notes
 

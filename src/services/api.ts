@@ -4,18 +4,13 @@ import type {
   ProductFormData,
   ProductsResponse,
 } from "@/types/product";
-import type { ApiErrorData } from "@/types/api";
 import axios, { AxiosError, AxiosInstance } from "axios";
+
+import type { ApiErrorData } from "@/types/api";
 import { logger } from "@/utils/logger";
 
-// API base URL - supports BFF pattern via environment variable
-// Defaults to DummyJSON for current implementation
-// Can be switched to BFF by setting VITE_API_BASE_URL or VITE_BFF_URL
-// Priority: VITE_BFF_URL > VITE_API_BASE_URL > default DummyJSON
-const API_BASE_URL =
-  import.meta.env.VITE_BFF_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://dummyjson.com";
+// API base URL - DummyJSON API
+const API_BASE_URL = "https://dummyjson.com";
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
@@ -29,13 +24,11 @@ const api: AxiosInstance = axios.create({
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
+  response => response,
   (error: AxiosError<ApiErrorData>) => {
     // Global error handler
     const message =
-      error.response?.data?.message ||
-      error.message ||
-      "Unknown error";
+      error.response?.data?.message || error.message || "Unknown error";
 
     // Handle specific error cases
     if (error.code === "ERR_NETWORK") {
