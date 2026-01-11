@@ -51,11 +51,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
-import ProductsSearch from "@/components/products/ProductsSearch.vue";
-import ProductsToolbar from "@/components/products/ProductsToolbar.vue";
-import ProductsContent from "@/components/products/ProductsContent.vue";
-import ProductListFooter from "@/components/products/ProductListFooter.vue";
-import DeleteConfirmationDialog from "@/components/product/DeleteConfirmationDialog.vue";
+import ProductsSearch from "@/components/product/list/ProductsSearch.vue";
+import ProductsToolbar from "@/components/product/list/ProductsToolbar.vue";
+import ProductsContent from "@/components/product/list/ProductsContent.vue";
+import ProductListFooter from "@/components/product/list/ProductListFooter.vue";
+import DeleteConfirmationDialog from "@/components/product/form/DeleteConfirmationDialog.vue";
 import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
 import { useCategory } from "@/composables/useCategory";

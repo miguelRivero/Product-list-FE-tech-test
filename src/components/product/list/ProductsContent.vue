@@ -78,7 +78,7 @@ import ProductsLoadingState from "./ProductsLoadingState.vue";
 import ProductsErrorState from "./ProductsErrorState.vue";
 import ProductsList from "./ProductsList.vue";
 import ProductsEmptyState from "./ProductsEmptyState.vue";
-import ProductForm from "@/components/product/ProductForm.vue";
+import ProductForm from "@/components/product/form/ProductForm.vue";
 import { useDialog } from "@/composables/useDialog";
 import type { Product, Category, ProductFormData } from "@/types/product";
 import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";
