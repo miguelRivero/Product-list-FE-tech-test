@@ -24,7 +24,14 @@ export class Product {
     private readonly thumbnail: string,
     private readonly tags: string[],
     private readonly brand?: string,
-    private readonly sku?: string
+    private readonly sku?: string,
+    // Preserve meta field for createdAt/updatedAt (used in ProductDetailMetadata)
+    private readonly meta?: {
+      createdAt: string;
+      updatedAt: string;
+      barcode?: string;
+      qrCode?: string;
+    }
   ) {
     this.validate();
   }
@@ -43,6 +50,12 @@ export class Product {
     tags?: string[];
     brand?: string;
     sku?: string;
+    meta?: {
+      createdAt: string;
+      updatedAt: string;
+      barcode?: string;
+      qrCode?: string;
+    };
   }): Product {
     return new Product(
       params.id,
@@ -57,7 +70,8 @@ export class Product {
       params.thumbnail || '',
       params.tags || [],
       params.brand,
-      params.sku
+      params.sku,
+      params.meta
     );
   }
 
@@ -182,6 +196,7 @@ export class Product {
       tags: dto.tags,
       brand: dto.brand,
       sku: dto.sku,
+      meta: dto.meta,
     });
   }
 
@@ -201,6 +216,7 @@ export class Product {
       tags: this.tags,
       brand: this.brand,
       sku: this.sku,
+      meta: this.meta,
     };
   }
 }
