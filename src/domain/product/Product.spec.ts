@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { Product } from "./Product";
 import { ProductId } from "./ProductId";
 import { ProductTitle } from "./ProductTitle";
-import { Money } from "./Money";
+import { Price } from "./Price";
 import { Stock } from "./Stock";
 import { DiscountPercentage } from "./DiscountPercentage";
 import { InvalidProductError } from "./errors";
@@ -14,7 +14,7 @@ describe("Product", () => {
       title: ProductTitle.create("Test Product"),
       description: "Test description",
       category: "electronics",
-      price: Money.create(100),
+      price: Price.create(100),
       stock: Stock.create(50),
     });
   };
@@ -37,7 +37,7 @@ describe("Product", () => {
         title: ProductTitle.create("Test Product"),
         description: "Test description",
         category: "electronics",
-        price: Money.create(100),
+        price: Price.create(100),
         stock: Stock.create(50),
         discountPercentage: DiscountPercentage.create(10),
         rating: 4.5,
@@ -80,7 +80,7 @@ describe("Product", () => {
           title: ProductTitle.create("Test Product"),
           description: "",
           category: "electronics",
-          price: Money.create(100),
+          price: Price.create(100),
           stock: Stock.create(50),
         })
       ).toThrow(InvalidProductError);
@@ -93,7 +93,7 @@ describe("Product", () => {
           title: ProductTitle.create("Test Product"),
           description: "   ",
           category: "electronics",
-          price: Money.create(100),
+          price: Price.create(100),
           stock: Stock.create(50),
         })
       ).toThrow(InvalidProductError);
@@ -107,7 +107,7 @@ describe("Product", () => {
           title: ProductTitle.create("Test Product"),
           description: longDescription,
           category: "electronics",
-          price: Money.create(100),
+          price: Price.create(100),
           stock: Stock.create(50),
         })
       ).toThrow(InvalidProductError);
@@ -120,7 +120,7 @@ describe("Product", () => {
           title: ProductTitle.create("Test Product"),
           description: "Test description",
           category: "electronics",
-          price: Money.create(100),
+          price: Price.create(100),
           stock: Stock.create(50),
           rating: -1,
         })
@@ -134,7 +134,7 @@ describe("Product", () => {
           title: ProductTitle.create("Test Product"),
           description: "Test description",
           category: "electronics",
-          price: Money.create(100),
+          price: Price.create(100),
           stock: Stock.create(50),
           rating: 6,
         })
@@ -181,7 +181,7 @@ describe("Product", () => {
   describe("updatePrice", () => {
     it("updates product price", () => {
       const product = createValidProduct();
-      const newPrice = Money.create(200);
+      const newPrice = Price.create(200);
 
       product.updatePrice(newPrice);
 
@@ -269,7 +269,7 @@ describe("Product", () => {
         title: ProductTitle.create("Test Product"),
         description: "Test description",
         category: "electronics",
-        price: Money.create(100),
+        price: Price.create(100),
         stock: Stock.create(50),
         discountPercentage: DiscountPercentage.create(10),
         rating: 4.5,

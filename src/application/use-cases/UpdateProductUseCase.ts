@@ -1,7 +1,7 @@
 import type { ProductRepository } from "@/domain/product/ProductRepository";
 import { ProductId } from "@/domain/product/ProductId";
 import { ProductTitle } from "@/domain/product/ProductTitle";
-import { Money } from "@/domain/product/Money";
+import { Price } from "@/domain/product/Price";
 import { Stock } from "@/domain/product/Stock";
 import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
 import { ProductNotFoundError } from "@/domain/product/errors";
@@ -36,7 +36,7 @@ export class UpdateProductUseCase {
     }
 
     if (updates.price !== undefined) {
-      product.updatePrice(Money.create(updates.price));
+      product.updatePrice(Price.create(updates.price));
     }
 
     if (updates.discountPercentage !== undefined) {

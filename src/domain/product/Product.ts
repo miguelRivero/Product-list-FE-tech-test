@@ -1,10 +1,10 @@
+import { DiscountPercentage } from "./DiscountPercentage";
+import { InvalidProductError } from "./errors";
+import { Price } from "./Price";
+import type { ProductDTO } from "./ProductDTO";
 import { ProductId } from "./ProductId";
 import { ProductTitle } from "./ProductTitle";
-import { Money } from "./Money";
-import { DiscountPercentage } from "./DiscountPercentage";
 import { Stock } from "./Stock";
-import { InvalidProductError } from "./errors";
-import type { ProductDTO } from "./ProductDTO";
 
 /**
  * Product Entity (Aggregate Root)
@@ -16,7 +16,7 @@ export class Product {
     private title: ProductTitle,
     private description: string,
     private category: string, // Category name as string (matches API)
-    private price: Money,
+    private price: Price,
     private discountPercentage: DiscountPercentage,
     private stock: Stock,
     private rating: number,
@@ -41,7 +41,7 @@ export class Product {
     title: ProductTitle;
     description: string;
     category: string;
-    price: Money;
+    price: Price;
     discountPercentage?: DiscountPercentage;
     stock: Stock;
     rating?: number;
@@ -108,7 +108,7 @@ export class Product {
     return this.category;
   }
 
-  getPrice(): Money {
+  getPrice(): Price {
     return this.price;
   }
 
@@ -161,7 +161,7 @@ export class Product {
     this.description = newDescription;
   }
 
-  updatePrice(newPrice: Money): void {
+  updatePrice(newPrice: Price): void {
     this.price = newPrice;
   }
 
@@ -187,7 +187,7 @@ export class Product {
       title: ProductTitle.create(dto.title),
       description: dto.description,
       category: dto.category,
-      price: Money.create(dto.price),
+      price: Price.create(dto.price),
       discountPercentage: DiscountPercentage.create(
         dto.discountPercentage || 0
       ),

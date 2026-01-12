@@ -3,7 +3,7 @@ import { ProductDomainService } from "./ProductDomainService";
 import { Product } from "./Product";
 import { ProductId } from "./ProductId";
 import { ProductTitle } from "./ProductTitle";
-import { Money } from "./Money";
+import { Price } from "./Price";
 import { Stock } from "./Stock";
 import { DuplicateProductTitleError } from "./errors";
 
@@ -14,7 +14,7 @@ describe("ProductDomainService", () => {
       title: ProductTitle.create(title),
       description: "Test description",
       category: "electronics",
-      price: Money.create(100),
+      price: Price.create(100),
       stock: Stock.create(50),
     });
   };

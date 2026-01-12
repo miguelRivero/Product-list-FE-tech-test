@@ -1,6 +1,6 @@
 import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
 import { DuplicateProductTitleError } from "@/domain/product/errors";
-import { Money } from "@/domain/product/Money";
+import { Price } from "@/domain/product/Price";
 import { Product } from "@/domain/product/Product";
 import type { ProductFormData } from "@/types/product";
 import { ProductId } from "@/domain/product/ProductId";
@@ -19,7 +19,7 @@ export class CreateProductUseCase {
     // Create value objects from input data
     const id = ProductId.createClientId(clientId);
     const title = ProductTitle.create(data.title);
-    const price = Money.create(data.price);
+    const price = Price.create(data.price);
     const stock = Stock.create(data.stock);
     const discount = data.discountPercentage
       ? DiscountPercentage.create(data.discountPercentage)

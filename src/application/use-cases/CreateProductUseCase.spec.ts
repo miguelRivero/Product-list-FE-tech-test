@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateProductUseCase } from "./CreateProductUseCase";
 import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
 import { DuplicateProductTitleError } from "@/domain/product/errors";
-import { Money } from "@/domain/product/Money";
+import { Price } from "@/domain/product/Price";
 import { Product } from "@/domain/product/Product";
 import type { ProductFormData } from "@/types/product";
 import { ProductId } from "@/domain/product/ProductId";
@@ -53,7 +53,7 @@ describe("CreateProductUseCase", () => {
       title: ProductTitle.create(formData.title),
       description: formData.description,
       category: formData.category,
-      price: Money.create(formData.price),
+      price: Price.create(formData.price),
       discountPercentage: DiscountPercentage.create(
         formData.discountPercentage!
       ),
@@ -96,7 +96,7 @@ describe("CreateProductUseCase", () => {
       title: ProductTitle.create(formData.title),
       description: formData.description,
       category: formData.category,
-      price: Money.create(formData.price),
+      price: Price.create(formData.price),
       stock: Stock.create(formData.stock),
     });
 
@@ -117,7 +117,7 @@ describe("CreateProductUseCase", () => {
       title: ProductTitle.create(formData.title),
       description: formData.description,
       category: formData.category,
-      price: Money.create(formData.price),
+      price: Price.create(formData.price),
       stock: Stock.create(formData.stock),
     });
 

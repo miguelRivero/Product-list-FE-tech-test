@@ -15,7 +15,7 @@ export class DomainError extends Error {
 }
 
 export class InvalidProductIdError extends DomainError {}
-export class InvalidMoneyError extends DomainError {}
+export class InvalidPriceError extends DomainError {}
 export class InvalidDiscountPercentageError extends DomainError {}
 export class InvalidProductTitleError extends DomainError {}
 export class InvalidStockError extends DomainError {}

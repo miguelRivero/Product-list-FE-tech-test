@@ -4,7 +4,7 @@ import type { ProductRepository } from "@/domain/product/ProductRepository";
 import { Product } from "@/domain/product/Product";
 import { ProductId } from "@/domain/product/ProductId";
 import { ProductTitle } from "@/domain/product/ProductTitle";
-import { Money } from "@/domain/product/Money";
+import { Price } from "@/domain/product/Price";
 import { Stock } from "@/domain/product/Stock";
 import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
 import { ProductNotFoundError } from "@/domain/product/errors";
@@ -35,7 +35,7 @@ describe("UpdateProductUseCase", () => {
       title: ProductTitle.create("Original Product"),
       description: "Original description",
       category: "electronics",
-      price: Money.create(100),
+      price: Price.create(100),
       stock: Stock.create(50),
     });
   };
@@ -50,7 +50,7 @@ describe("UpdateProductUseCase", () => {
     const existingProduct = createMockProduct();
     const updatedProduct = createMockProduct();
     updatedProduct.updateTitle(ProductTitle.create(updates.title!));
-    updatedProduct.updatePrice(Money.create(updates.price!));
+    updatedProduct.updatePrice(Price.create(updates.price!));
 
     vi.mocked(mockRepository.findById).mockResolvedValue(existingProduct);
     vi.mocked(mockRepository.save).mockResolvedValue(updatedProduct);
@@ -94,7 +94,7 @@ describe("UpdateProductUseCase", () => {
     const updatedProduct = createMockProduct();
     updatedProduct.updateTitle(ProductTitle.create(updates.title!));
     updatedProduct.updateDescription(updates.description!);
-    updatedProduct.updatePrice(Money.create(updates.price!));
+    updatedProduct.updatePrice(Price.create(updates.price!));
     updatedProduct.updateStock(Stock.create(updates.stock!));
     updatedProduct.applyDiscount(
       DiscountPercentage.create(updates.discountPercentage!)
@@ -118,7 +118,7 @@ describe("UpdateProductUseCase", () => {
 
     const existingProduct = createMockProduct();
     const updatedProduct = createMockProduct();
-    updatedProduct.updatePrice(Money.create(updates.price!));
+    updatedProduct.updatePrice(Price.create(updates.price!));
 
     vi.mocked(mockRepository.findById).mockResolvedValue(existingProduct);
     vi.mocked(mockRepository.save).mockResolvedValue(updatedProduct);
