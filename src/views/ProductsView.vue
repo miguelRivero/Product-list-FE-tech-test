@@ -42,7 +42,7 @@
       :is-deleting="isDeleting"
       :error-message="deleteError"
       :success-message="deleteSuccess"
-      @update:visible="showDeleteDialog = $event"
+      @update:visible="handleDialogVisibilityChange"
       @confirm="handleDeleteConfirm"
       @cancel="handleDeleteCancel"
     />
@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch } from "vue";
 import ProductsSearch from "@/components/product/list/ProductsSearch.vue";
 import ProductsToolbar from "@/components/product/list/ProductsToolbar.vue";
 import ProductsContent from "@/components/product/list/ProductsContent.vue";
@@ -78,7 +78,6 @@ const {
   categories,
   currentPage,
   pageSize,
-  selectedCategory,
   fetchProducts,
   fetchCategories,
   setSelectedCategory,
@@ -127,7 +126,10 @@ watch(selectedCategoryValue, newCategory => {
 });
 
 const onPageChange = (event: { page: number; first: number; rows: number }) => {
-  fetchProducts(event.page + 1, event.rows);
+  // PrimeVue Paginator uses 0-indexed pages, but our API uses 1-indexed pages
+  // Calculate page number from first index: page = (first / rows) + 1
+  const pageNumber = Math.floor(event.first / event.rows) + 1;
+  fetchProducts(pageNumber, event.rows);
 };
 
 const viewProductHandler = (id: number) => {
@@ -171,8 +173,7 @@ const handleSaveProduct = async (data: ProductFormData, productId?: number) => {
       productsContentRef.value.setSaveSuccess("Product created successfully");
       setTimeout(() => {
         handleCloseDialog();
-      }, DIALOG_AUTO_CLOSE_DELAY); // Using constant would require importing, keeping as is for now
-      // Product is already added to the top of the list by the store
+      }, DIALOG_AUTO_CLOSE_DELAY);
     }
   } catch (err) {
     const errorMessage =
@@ -215,6 +216,15 @@ const handleDeleteCancel = () => {
   productToDelete.value = null;
   deleteError.value = null;
   deleteSuccess.value = null;
+};
+
+const handleDialogVisibilityChange = (visible: boolean) => {
+  showDeleteDialog.value = visible;
+  if (!visible) {
+    productToDelete.value = null;
+    deleteError.value = null;
+    deleteSuccess.value = null;
+  }
 };
 </script>
 
