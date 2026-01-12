@@ -40,11 +40,11 @@ class DIContainer {
     return new UpdateProductUseCase(this.getProductRepository());
   }
 
-  getGetProductsUseCase(): GetProductsUseCase {
+  getProductsUseCase(): GetProductsUseCase {
     return new GetProductsUseCase(this.getProductRepository());
   }
 
-  getGetProductUseCase(): GetProductUseCase {
+  getProductUseCase(): GetProductUseCase {
     return new GetProductUseCase(this.getProductRepository());
   }
 

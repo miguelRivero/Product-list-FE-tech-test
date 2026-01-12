@@ -43,7 +43,7 @@ export const useProductsStore = defineStore("products", () => {
     pageSize.value = limit;
 
     try {
-      const useCase = diContainer.getGetProductsUseCase();
+      const useCase = diContainer.getProductsUseCase();
       const result = await useCase.execute(
         page,
         limit,
@@ -89,7 +89,7 @@ export const useProductsStore = defineStore("products", () => {
         selectedProduct.value = cached;
         logger.debug("Using cached product", { id });
       } else {
-        const useCase = diContainer.getGetProductUseCase();
+        const useCase = diContainer.getProductUseCase();
         const domainProduct = await useCase.execute(id);
         const apiProduct = domainProductToApiProduct(domainProduct);
         selectedProduct.value = apiProduct;

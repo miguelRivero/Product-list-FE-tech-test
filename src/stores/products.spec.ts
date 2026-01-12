@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { setActivePinia, createPinia } from "pinia";
-import { useProductsStore } from "./products";
-import { productsApi } from "@/services/api";
-import type { Product, Category } from "@/types/product";
-import { Product as DomainProduct } from "@/domain/product/Product";
+import type { Category, Product } from "@/types/product";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/utils/constants";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createPinia, setActivePinia } from "pinia";
+
+import { Product as DomainProduct } from "@/domain/product/Product";
+import { productsApi } from "@/services/api";
+import { useProductsStore } from "./products";
 
 // Create mock use cases
 const mockGetProductsUseCase = {
@@ -30,8 +31,8 @@ const mockDeleteProductUseCase = {
 // Mock DI container
 vi.mock("@/infrastructure/di/container", () => ({
   diContainer: {
-    getGetProductsUseCase: () => mockGetProductsUseCase,
-    getGetProductUseCase: () => mockGetProductUseCase,
+    getProductsUseCase: () => mockGetProductsUseCase,
+    getProductUseCase: () => mockGetProductUseCase,
     getCreateProductUseCase: () => mockCreateProductUseCase,
     getUpdateProductUseCase: () => mockUpdateProductUseCase,
     getDeleteProductUseCase: () => mockDeleteProductUseCase,
@@ -74,7 +75,9 @@ vi.mock("@/services/api", () => ({
 }));
 
 // Helper function to create domain product from API product data
-function createDomainProductFromApiData(apiProduct: Partial<Product>): DomainProduct {
+function createDomainProductFromApiData(
+  apiProduct: Partial<Product>
+): DomainProduct {
   return DomainProduct.fromDTO({
     id: apiProduct.id!,
     title: apiProduct.title!,
@@ -232,7 +235,11 @@ describe("Products Store", () => {
     const store = useProductsStore();
 
     const mockCategories: Category[] = [
-      { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+      {
+        slug: "electronics",
+        name: "Electronics",
+        url: "/categories/electronics",
+      },
       { slug: "beauty", name: "Beauty", url: "/categories/beauty" },
       { slug: "furniture", name: "Furniture", url: "/categories/furniture" },
     ];
@@ -256,7 +263,12 @@ describe("Products Store", () => {
     await store.setSearchQuery("test query");
 
     expect(store.searchQuery).toBe("test query");
-    expect(mockGetProductsUseCase.execute).toHaveBeenCalledWith(1, 10, undefined, "test query");
+    expect(mockGetProductsUseCase.execute).toHaveBeenCalledWith(
+      1,
+      10,
+      undefined,
+      "test query"
+    );
   });
 
   it("sets selected category and refetches products", async () => {
@@ -272,7 +284,12 @@ describe("Products Store", () => {
     await store.setSelectedCategory("electronics");
 
     expect(store.selectedCategory).toBe("electronics");
-    expect(mockGetProductsUseCase.execute).toHaveBeenCalledWith(1, 10, "electronics", undefined);
+    expect(mockGetProductsUseCase.execute).toHaveBeenCalledWith(
+      1,
+      10,
+      "electronics",
+      undefined
+    );
   });
 
   it("resets store state", () => {
@@ -468,7 +485,9 @@ describe("Products Store", () => {
     store.products = [product];
     store.total = 1;
 
-    mockDeleteProductUseCase.execute.mockRejectedValue(new Error("Delete failed"));
+    mockDeleteProductUseCase.execute.mockRejectedValue(
+      new Error("Delete failed")
+    );
 
     await expect(store.deleteProduct(1)).rejects.toThrow("Delete failed");
 
