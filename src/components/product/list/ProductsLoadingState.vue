@@ -25,4 +25,3 @@ import ProgressSpinner from "primevue/progressspinner";
   margin: 0;
 }
 </style>
-

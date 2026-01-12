@@ -1,4 +1,4 @@
-import { reactive, watch, computed, type Ref, type ComputedRef } from "vue";
+import { reactive, watch, type Ref, type ComputedRef } from "vue";
 import type { Product, Category, ProductFormData } from "@/types/product";
 import { useCategory } from "./useCategory";
 
@@ -37,13 +37,15 @@ export function useProductForm(
     formData.discountPercentage = product.discountPercentage || 0;
     formData.stock = product.stock;
     // Convert category name to slug if needed
-    const category = categories.value.find((cat) => cat.name === product.category);
+    const category = categories.value.find(
+      cat => cat.name === product.category
+    );
     formData.category = category ? category.slug : product.category;
   };
 
   watch(
     () => product.value,
-    (newProduct) => {
+    newProduct => {
       if (newProduct) {
         populateForm(newProduct);
       } else {

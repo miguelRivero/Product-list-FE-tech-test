@@ -7,8 +7,8 @@
     :page-link-size="pageLinkSize"
     :template="templateConfig"
     class="products-pagination"
-    @page="$emit('page-change', $event)"
     data-testid="pagination"
+    @page="$emit('page-change', $event)"
   />
 </template>
 
@@ -16,7 +16,7 @@
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import Paginator from "primevue/paginator";
 
-const props = defineProps<{
+defineProps<{
   currentPage: number;
   pageSize: number;
   total: number;

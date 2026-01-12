@@ -7,7 +7,9 @@ describe("ProductsEmptyState", () => {
     const wrapper = mount(ProductsEmptyState);
 
     expect(wrapper.text()).toContain("No products found");
-    expect(wrapper.text()).toContain("Try adjusting your search or filter criteria");
+    expect(wrapper.text()).toContain(
+      "Try adjusting your search or filter criteria"
+    );
   });
 
   it("has empty icon", () => {

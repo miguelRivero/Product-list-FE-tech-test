@@ -1,5 +1,5 @@
-import { InvalidProductIdError } from './errors';
-import { CLIENT_ID_RANGE } from '@/utils/constants';
+import { InvalidProductIdError } from "./errors";
+import { CLIENT_ID_RANGE } from "@/utils/constants";
 
 /**
  * ProductId Value Object
@@ -8,7 +8,9 @@ import { CLIENT_ID_RANGE } from '@/utils/constants';
 export class ProductId {
   private constructor(private readonly value: number) {
     if (value <= 0) {
-      throw new InvalidProductIdError(`Product ID must be positive, got: ${value}`);
+      throw new InvalidProductIdError(
+        `Product ID must be positive, got: ${value}`
+      );
     }
   }
 
@@ -35,7 +37,9 @@ export class ProductId {
   }
 
   isClientGenerated(): boolean {
-    return this.value >= CLIENT_ID_RANGE.MIN && this.value <= CLIENT_ID_RANGE.MAX;
+    return (
+      this.value >= CLIENT_ID_RANGE.MIN && this.value <= CLIENT_ID_RANGE.MAX
+    );
   }
 
   toString(): string {

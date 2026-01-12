@@ -12,15 +12,15 @@
           label="Edit"
           icon="pi pi-pencil"
           class="action-button"
-          @click="$emit('edit')"
           aria-label="Edit product"
+          @click="$emit('edit')"
         />
         <Button
           label="Delete"
           icon="pi pi-trash"
           class="action-button"
-          @click="$emit('delete')"
           aria-label="Delete product"
+          @click="$emit('delete')"
         />
       </div>
     </div>

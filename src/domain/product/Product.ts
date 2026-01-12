@@ -1,10 +1,10 @@
-import { ProductId } from './ProductId';
-import { ProductTitle } from './ProductTitle';
-import { Money } from './Money';
-import { DiscountPercentage } from './DiscountPercentage';
-import { Stock } from './Stock';
-import { InvalidProductError } from './errors';
-import type { ProductDTO } from './ProductDTO';
+import { ProductId } from "./ProductId";
+import { ProductTitle } from "./ProductTitle";
+import { Money } from "./Money";
+import { DiscountPercentage } from "./DiscountPercentage";
+import { Stock } from "./Stock";
+import { InvalidProductError } from "./errors";
+import type { ProductDTO } from "./ProductDTO";
 
 /**
  * Product Entity (Aggregate Root)
@@ -67,7 +67,7 @@ export class Product {
       params.stock,
       params.rating || 0,
       params.images || [],
-      params.thumbnail || '',
+      params.thumbnail || "",
       params.tags || [],
       params.brand,
       params.sku,
@@ -77,7 +77,7 @@ export class Product {
 
   private validate(): void {
     if (this.description.trim().length === 0) {
-      throw new InvalidProductError('Product description cannot be empty');
+      throw new InvalidProductError("Product description cannot be empty");
     }
     if (this.description.length > 5000) {
       throw new InvalidProductError(
@@ -151,7 +151,7 @@ export class Product {
 
   updateDescription(newDescription: string): void {
     if (newDescription.trim().length === 0) {
-      throw new InvalidProductError('Product description cannot be empty');
+      throw new InvalidProductError("Product description cannot be empty");
     }
     if (newDescription.length > 5000) {
       throw new InvalidProductError(
@@ -167,7 +167,7 @@ export class Product {
 
   updateCategory(newCategory: string): void {
     if (!newCategory || newCategory.trim().length === 0) {
-      throw new InvalidProductError('Product category cannot be empty');
+      throw new InvalidProductError("Product category cannot be empty");
     }
     this.category = newCategory;
   }
@@ -188,7 +188,9 @@ export class Product {
       description: dto.description,
       category: dto.category,
       price: Money.create(dto.price),
-      discountPercentage: DiscountPercentage.create(dto.discountPercentage || 0),
+      discountPercentage: DiscountPercentage.create(
+        dto.discountPercentage || 0
+      ),
       stock: Stock.create(dto.stock),
       rating: dto.rating || 0,
       images: dto.images,

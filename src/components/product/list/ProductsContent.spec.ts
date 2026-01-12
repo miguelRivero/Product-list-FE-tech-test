@@ -1,12 +1,15 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import { describe, it, expect } from "vitest";
 import ProductsContent from "./ProductsContent.vue";
 import type { Product, Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
 
 describe("ProductsContent", () => {
   const mockCategories: Category[] = [
-    { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+    {
+      slug: "electronics",
+      name: "Electronics",
+      url: "/categories/electronics",
+    },
   ];
 
   const mockProducts: Product[] = [
@@ -97,7 +100,9 @@ describe("ProductsContent", () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="product-create-dialog"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="product-create-dialog"]').exists()).toBe(
+      true
+    );
   });
 
   it("shows edit dialog when editingProduct is provided", () => {
@@ -112,7 +117,9 @@ describe("ProductsContent", () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="product-edit-dialog"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="product-edit-dialog"]').exists()).toBe(
+      true
+    );
   });
 
   it("emits view event when view is triggered", async () => {

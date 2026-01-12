@@ -4,7 +4,9 @@ test.describe("Product CRUD Operations", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     // Wait for products to load
-    await page.waitForSelector('[data-testid="products-table"]', { timeout: 10000 });
+    await page.waitForSelector('[data-testid="products-table"]', {
+      timeout: 10000,
+    });
   });
 
   test("opens create product dialog", async ({ page }) => {
@@ -15,7 +17,7 @@ test.describe("Product CRUD Operations", () => {
     // Wait for dialog
     const dialog = page.getByTestId("product-create-dialog");
     await expect(dialog).toBeVisible({ timeout: 5000 });
-    
+
     // Verify form fields are visible
     await expect(page.getByTestId("product-title-input")).toBeVisible();
     await expect(page.getByTestId("product-category-select")).toBeVisible();
@@ -32,13 +34,15 @@ test.describe("Product CRUD Operations", () => {
 
     // Fill form
     await page.getByTestId("product-title-input").fill("E2E Test Product");
-    await page.getByTestId("product-description-input").fill("This is a test product created by E2E tests");
-    
+    await page
+      .getByTestId("product-description-input")
+      .fill("This is a test product created by E2E tests");
+
     // For InputNumber fields, use the nested input element
     const priceInput = page.getByTestId("product-price-input").locator("input");
     await priceInput.click();
     await priceInput.fill("99.99");
-    
+
     const stockInput = page.getByTestId("product-stock-input").locator("input");
     await stockInput.click();
     await stockInput.fill("50");
@@ -46,7 +50,7 @@ test.describe("Product CRUD Operations", () => {
     // Select category - more robust approach
     const categorySelect = page.getByTestId("product-category-select");
     await categorySelect.click();
-    
+
     // Wait for options to be visible and click first one
     const firstOption = page.locator('[role="option"]').first();
     await expect(firstOption).toBeVisible({ timeout: 2000 });
@@ -58,8 +62,10 @@ test.describe("Product CRUD Operations", () => {
 
     // Wait for dialog to close
     await expect(dialog).toBeHidden({ timeout: 10000 });
-    
+
     // Verify product appears in list
-    await expect(page.getByText("E2E Test Product")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText("E2E Test Product")).toBeVisible({
+      timeout: 5000,
+    });
   });
 });

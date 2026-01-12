@@ -1,7 +1,7 @@
 <template>
   <div
-    class="product-detail-gallery"
     v-if="product.images && product.images.length > 0"
+    class="product-detail-gallery"
   >
     <div class="gallery-images flex gap-4">
       <div

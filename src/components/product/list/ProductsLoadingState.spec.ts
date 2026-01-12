@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
 import ProductsLoadingState from "./ProductsLoadingState.vue";
 import { mountWithStubs } from "@/test-utils/helpers";
 

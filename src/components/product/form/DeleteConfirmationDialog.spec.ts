@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog.vue";
 import { mountWithStubs } from "@/test-utils/helpers";
 
@@ -15,7 +14,9 @@ describe("DeleteConfirmationDialog", () => {
       props: defaultProps,
     });
 
-    expect(wrapper.find('[data-testid="delete-confirmation-dialog"]').exists()).toBe(true);
+    expect(
+      wrapper.find('[data-testid="delete-confirmation-dialog"]').exists()
+    ).toBe(true);
   });
 
   it("does not render dialog when visible is false", () => {
@@ -26,7 +27,9 @@ describe("DeleteConfirmationDialog", () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="delete-confirmation-dialog"]').exists()).toBe(false);
+    expect(
+      wrapper.find('[data-testid="delete-confirmation-dialog"]').exists()
+    ).toBe(false);
   });
 
   it("displays product title in confirmation message", () => {
@@ -70,7 +73,7 @@ describe("DeleteConfirmationDialog", () => {
 
     // Find delete button by text content
     const buttons = wrapper.findAll("button");
-    const deleteButton = buttons.find((btn) => btn.text().includes("Delete"));
+    const deleteButton = buttons.find(btn => btn.text().includes("Delete"));
     expect(deleteButton).toBeDefined();
 
     if (deleteButton) {
@@ -86,7 +89,7 @@ describe("DeleteConfirmationDialog", () => {
 
     // Find cancel button by text content
     const buttons = wrapper.findAll("button");
-    const cancelButton = buttons.find((btn) => btn.text().includes("Cancel"));
+    const cancelButton = buttons.find(btn => btn.text().includes("Cancel"));
     expect(cancelButton).toBeDefined();
 
     if (cancelButton) {
@@ -106,7 +109,7 @@ describe("DeleteConfirmationDialog", () => {
     });
 
     const buttons = wrapper.findAll("button");
-    const deleteButton = buttons.find((btn) => btn.text().includes("Delete"));
+    const deleteButton = buttons.find(btn => btn.text().includes("Delete"));
     if (deleteButton) {
       expect(deleteButton.attributes("disabled")).toBeDefined();
     }

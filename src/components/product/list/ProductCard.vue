@@ -28,9 +28,7 @@
         </div>
         <div class="product-price-section">
           <div class="price-container">
-            <span class="product-price">
-              ${{ product.price.toFixed(2) }}
-            </span>
+            <span class="product-price"> ${{ product.price.toFixed(2) }} </span>
             <span
               v-if="product.discountPercentage > 0"
               class="product-price-original"
@@ -60,8 +58,8 @@
             size="small"
             outlined
             class="action-button"
-            @click="$emit('view', product.id)"
             data-testid="view-button"
+            @click="$emit('view', product.id)"
           />
           <Button
             icon="pi pi-pencil"
@@ -69,8 +67,8 @@
             size="small"
             outlined
             class="action-button"
-            @click="$emit('edit', product.id)"
             data-testid="edit-button"
+            @click="$emit('edit', product.id)"
           />
           <Button
             icon="pi pi-trash"
@@ -79,8 +77,8 @@
             severity="danger"
             outlined
             class="action-button"
-            @click="$emit('delete', product)"
             data-testid="delete-button"
+            @click="$emit('delete', product)"
           />
         </div>
       </div>
@@ -121,7 +119,9 @@ const handleImageError = (event: Event) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   border: 1px solid var(--p-border-color);
   overflow: hidden;
 
@@ -265,4 +265,3 @@ const handleImageError = (event: Event) => {
   font-size: 0.875rem;
 }
 </style>
-

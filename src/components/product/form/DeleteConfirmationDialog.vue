@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";

@@ -12,9 +12,9 @@
       label="Add new"
       icon="pi pi-plus"
       class="add-product-button flex-shrink-0"
-      @click="$emit('add-product')"
       data-testid="add-product-button"
       aria-label="Add new product"
+      @click="$emit('add-product')"
     />
   </div>
 </template>

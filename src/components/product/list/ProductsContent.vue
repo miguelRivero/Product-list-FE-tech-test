@@ -26,7 +26,9 @@
       :modal="true"
       :style="{ width: '50vw' }"
       class="product-dialog"
-      :data-testid="editingProduct ? 'product-edit-dialog' : 'product-create-dialog'"
+      :data-testid="
+        editingProduct ? 'product-edit-dialog' : 'product-create-dialog'
+      "
       @update:visible="handleDialogClose"
     >
       <ProductForm

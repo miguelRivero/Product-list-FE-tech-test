@@ -18,14 +18,26 @@ class Logger {
   private logs: LogEntry[] = [];
   private maxLogs = 100; // Keep last 100 logs in memory
 
-  private formatMessage(level: LogLevel, message: string, error?: Error, context?: Record<string, unknown>): string {
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ): string {
     const timestamp = new Date().toISOString();
     const contextStr = context ? ` | Context: ${JSON.stringify(context)}` : "";
-    const errorStr = error ? ` | Error: ${error.message}${error.stack ? `\n${error.stack}` : ""}` : "";
+    const errorStr = error
+      ? ` | Error: ${error.message}${error.stack ? `\n${error.stack}` : ""}`
+      : "";
     return `[${timestamp}] [${level.toUpperCase()}] ${message}${contextStr}${errorStr}`;
   }
 
-  private addLog(level: LogLevel, message: string, error?: Error, context?: Record<string, unknown>): void {
+  private addLog(
+    level: LogLevel,
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ): void {
     const logEntry: LogEntry = {
       level,
       message,
@@ -50,9 +62,11 @@ class Logger {
           console.warn(formatted);
           break;
         case "info":
+          // eslint-disable-next-line no-console
           console.info(formatted);
           break;
         case "debug":
+          // eslint-disable-next-line no-console
           console.debug(formatted);
           break;
       }
@@ -62,7 +76,11 @@ class Logger {
     // Example: sendToLoggingService(logEntry);
   }
 
-  error(message: string, error?: Error, context?: Record<string, unknown>): void {
+  error(
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ): void {
     this.addLog("error", message, error, context);
   }
 
@@ -86,7 +104,7 @@ class Logger {
   getRecentLogs(level?: LogLevel, limit = 10): LogEntry[] {
     let filtered = this.logs;
     if (level) {
-      filtered = filtered.filter((log) => log.level === level);
+      filtered = filtered.filter(log => log.level === level);
     }
     return filtered.slice(-limit);
   }

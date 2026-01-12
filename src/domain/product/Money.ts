@@ -1,4 +1,4 @@
-import { InvalidMoneyError } from './errors';
+import { InvalidMoneyError } from "./errors";
 
 /**
  * Money Value Object
@@ -7,21 +7,25 @@ import { InvalidMoneyError } from './errors';
 export class Money {
   private constructor(
     private readonly amount: number,
-    private readonly currency: string = 'USD'
+    private readonly currency: string = "USD"
   ) {
     if (amount < 0) {
-      throw new InvalidMoneyError(`Money amount cannot be negative, got: ${amount}`);
+      throw new InvalidMoneyError(
+        `Money amount cannot be negative, got: ${amount}`
+      );
     }
     if (!Number.isFinite(amount)) {
-      throw new InvalidMoneyError(`Money amount must be finite, got: ${amount}`);
+      throw new InvalidMoneyError(
+        `Money amount must be finite, got: ${amount}`
+      );
     }
   }
 
-  static create(amount: number, currency: string = 'USD'): Money {
+  static create(amount: number, currency: string = "USD"): Money {
     return new Money(amount, currency);
   }
 
-  static zero(currency: string = 'USD'): Money {
+  static zero(currency: string = "USD"): Money {
     return new Money(0, currency);
   }
 

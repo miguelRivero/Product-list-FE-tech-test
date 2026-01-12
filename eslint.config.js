@@ -4,6 +4,7 @@ import prettierConfig from "eslint-config-prettier";
 import typescript from "@typescript-eslint/eslint-plugin";
 import typescriptParser from "@typescript-eslint/parser";
 import vue from "eslint-plugin-vue";
+import vueParser from "vue-eslint-parser";
 
 export default [
   js.configs.recommended,
@@ -14,6 +15,23 @@ export default [
       parserOptions: {
         ecmaVersion: 2022,
         sourceType: "module",
+      },
+      globals: {
+        // Browser globals
+        window: "readonly",
+        document: "readonly",
+        console: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        Event: "readonly",
+        HTMLImageElement: "readonly",
+        HTMLInputElement: "readonly",
+        HTMLSelectElement: "readonly",
+        // Node.js globals
+        crypto: "readonly",
+        process: "readonly",
       },
     },
     plugins: {
@@ -26,16 +44,45 @@ export default [
       ...vue.configs["vue3-recommended"].rules,
       ...prettierConfig.rules,
       "prettier/prettier": "warn",
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+          caughtErrors: "none",
+        },
+      ],
       "vue/multi-word-component-names": "off",
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
   {
     files: ["**/*.vue"],
-    parser: "vue-eslint-parser",
-    parserOptions: {
-      parser: typescriptParser,
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: typescriptParser,
+        ecmaVersion: 2022,
+        sourceType: "module",
+      },
+      globals: {
+        // Browser globals
+        window: "readonly",
+        document: "readonly",
+        console: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        Event: "readonly",
+        HTMLImageElement: "readonly",
+        HTMLInputElement: "readonly",
+        HTMLSelectElement: "readonly",
+        // Node.js globals
+        crypto: "readonly",
+        process: "readonly",
+      },
     },
   },
   {

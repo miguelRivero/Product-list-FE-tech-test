@@ -1,7 +1,7 @@
-import type { ProductRepository } from '@/domain/product/ProductRepository';
-import { ProductId } from '@/domain/product/ProductId';
-import { ProductNotFoundError } from '@/domain/product/errors';
-import type { Product } from '@/domain/product/Product';
+import type { ProductRepository } from "@/domain/product/ProductRepository";
+import { ProductId } from "@/domain/product/ProductId";
+import { ProductNotFoundError } from "@/domain/product/errors";
+import type { Product } from "@/domain/product/Product";
 
 /**
  * GetProductUseCase

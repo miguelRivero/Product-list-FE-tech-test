@@ -1,17 +1,19 @@
-import { computed, type Ref, type ComputedRef } from "vue";
+import type { Ref, ComputedRef } from "vue";
 import type { Category } from "@/types/product";
 
 /**
  * Composable for category utilities
  * Provides category conversion and formatting functions
  */
-export function useCategory(categories: Ref<Category[]> | ComputedRef<Category[]>) {
+export function useCategory(
+  categories: Ref<Category[]> | ComputedRef<Category[]>
+) {
   const findCategoryByName = (name: string): Category | undefined => {
-    return categories.value.find((cat) => cat.name === name);
+    return categories.value.find(cat => cat.name === name);
   };
 
   const findCategoryBySlug = (slug: string): Category | undefined => {
-    return categories.value.find((cat) => cat.slug === slug);
+    return categories.value.find(cat => cat.slug === slug);
   };
 
   const slugToName = (slug: string): string => {
@@ -21,15 +23,13 @@ export function useCategory(categories: Ref<Category[]> | ComputedRef<Category[]
 
   const nameToSlug = (name: string): string => {
     const category = findCategoryByName(name);
-    return category
-      ? category.slug
-      : name.toLowerCase().replace(/\s+/g, "-");
+    return category ? category.slug : name.toLowerCase().replace(/\s+/g, "-");
   };
 
   const capitalizeCategory = (category: string): string => {
     return category
       .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
 

@@ -1,12 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
 import ProductsList from "./ProductsList.vue";
 import type { Product, Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
 
 describe("ProductsList", () => {
   const mockCategories: Category[] = [
-    { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+    {
+      slug: "electronics",
+      name: "Electronics",
+      url: "/categories/electronics",
+    },
   ];
 
   const createMockProducts = (count: number): Product[] => {

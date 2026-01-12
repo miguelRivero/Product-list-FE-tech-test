@@ -13,14 +13,14 @@ export function generateSecureClientId(): number {
   // We'll use the first 8 hex characters as a base for the ID
   const uuid = crypto.randomUUID();
   const hexPart = uuid.replace(/-/g, "").substring(0, 8);
-  
+
   // Convert hex to number and ensure it's in the safe range
   const numericId = parseInt(hexPart, 16);
   const rangeSize = CLIENT_ID_RANGE.MAX - CLIENT_ID_RANGE.MIN + 1;
-  
+
   // Map to range to avoid conflicts with API IDs
   const mappedId = CLIENT_ID_RANGE.MIN + (numericId % rangeSize);
-  
+
   return mappedId;
 }
 

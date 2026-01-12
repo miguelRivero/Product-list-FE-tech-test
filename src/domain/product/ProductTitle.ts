@@ -1,4 +1,4 @@
-import { InvalidProductTitleError } from './errors';
+import { InvalidProductTitleError } from "./errors";
 
 /**
  * ProductTitle Value Object
@@ -8,7 +8,7 @@ export class ProductTitle {
   private constructor(private readonly value: string) {
     const trimmed = value.trim();
     if (trimmed.length === 0) {
-      throw new InvalidProductTitleError('Product title cannot be empty');
+      throw new InvalidProductTitleError("Product title cannot be empty");
     }
     if (trimmed.length > 200) {
       throw new InvalidProductTitleError(

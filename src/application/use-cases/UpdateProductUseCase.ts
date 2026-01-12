@@ -1,12 +1,12 @@
-import type { ProductRepository } from '@/domain/product/ProductRepository';
-import { ProductId } from '@/domain/product/ProductId';
-import { ProductTitle } from '@/domain/product/ProductTitle';
-import { Money } from '@/domain/product/Money';
-import { Stock } from '@/domain/product/Stock';
-import { DiscountPercentage } from '@/domain/product/DiscountPercentage';
-import { ProductNotFoundError } from '@/domain/product/errors';
-import type { ProductFormData } from '@/types/product';
-import type { Product } from '@/domain/product/Product';
+import type { ProductRepository } from "@/domain/product/ProductRepository";
+import { ProductId } from "@/domain/product/ProductId";
+import { ProductTitle } from "@/domain/product/ProductTitle";
+import { Money } from "@/domain/product/Money";
+import { Stock } from "@/domain/product/Stock";
+import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
+import { ProductNotFoundError } from "@/domain/product/errors";
+import type { ProductFormData } from "@/types/product";
+import type { Product } from "@/domain/product/Product";
 
 /**
  * UpdateProductUseCase
@@ -15,7 +15,10 @@ import type { Product } from '@/domain/product/Product';
 export class UpdateProductUseCase {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async execute(id: number, updates: Partial<ProductFormData>): Promise<Product> {
+  async execute(
+    id: number,
+    updates: Partial<ProductFormData>
+  ): Promise<Product> {
     const productId = ProductId.create(id);
     const product = await this.productRepository.findById(productId);
 

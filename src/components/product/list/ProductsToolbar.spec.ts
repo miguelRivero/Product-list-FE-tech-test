@@ -1,12 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
 import ProductsToolbar from "./ProductsToolbar.vue";
 import type { Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
 
 describe("ProductsToolbar", () => {
   const mockCategories: Category[] = [
-    { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+    {
+      slug: "electronics",
+      name: "Electronics",
+      url: "/categories/electronics",
+    },
     { slug: "beauty", name: "Beauty", url: "/categories/beauty" },
   ];
 
@@ -19,7 +22,9 @@ describe("ProductsToolbar", () => {
     });
 
     expect(wrapper.find('[data-testid="category-select"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="add-product-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="add-product-button"]').exists()).toBe(
+      true
+    );
   });
 
   it("emits add-product event when add button is clicked", async () => {

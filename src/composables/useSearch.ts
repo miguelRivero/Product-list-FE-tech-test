@@ -1,6 +1,9 @@
 import { ref, watch } from "vue";
 import { useDebounceFn } from "@vueuse/core";
-import { SEARCH_DEBOUNCE_DELAY, SEARCH_STATE_RESET_DELAY } from "@/utils/constants";
+import {
+  SEARCH_DEBOUNCE_DELAY,
+  SEARCH_STATE_RESET_DELAY,
+} from "@/utils/constants";
 
 /**
  * Composable for search functionality with debouncing
@@ -26,7 +29,7 @@ export function useSearch(
   }, delay);
 
   // Watch for search query changes
-  watch(searchQuery, (newQuery) => {
+  watch(searchQuery, newQuery => {
     if (newQuery.trim() === "") {
       // Clear search immediately if query is empty
       onSearch("");
@@ -41,4 +44,3 @@ export function useSearch(
     isSearching,
   };
 }
-

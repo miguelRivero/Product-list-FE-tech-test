@@ -5,67 +5,67 @@
         class="products-table w-full border-collapse"
         data-testid="products-table"
       >
-      <thead>
-        <tr class="table-header-row">
-          <th class="table-header-cell"></th>
-          <th class="table-header-cell">Title</th>
-          <th class="table-header-cell">Category</th>
-          <th class="table-header-cell">Price</th>
-          <th class="table-header-cell">Stock</th>
-          <th class="table-header-cell">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="product in products"
-          :key="product.id"
-          class="product-row transition-colors"
-          data-testid="product-row"
-        >
-          <td class="product-image-cell px-6 py-4 align-middle">
-            <div class="product-image-wrapper w-16 h-16 flex-shrink-0">
-              <img
-                :src="product.thumbnail"
-                :alt="product.title"
-                class="product-image w-full h-full rounded-md object-cover"
-                loading="lazy"
-                @error="handleImageError"
-              />
-            </div>
-          </td>
-          <td class="product-title-cell px-6 py-4 align-middle min-w-[200px]">
-            <span class="product-title-text">
-              {{ product.title }}
-            </span>
-          </td>
-          <td
-            class="product-category-cell px-6 py-4 align-middle min-w-[120px]"
+        <thead>
+          <tr class="table-header-row">
+            <th class="table-header-cell"></th>
+            <th class="table-header-cell">Title</th>
+            <th class="table-header-cell">Category</th>
+            <th class="table-header-cell">Price</th>
+            <th class="table-header-cell">Stock</th>
+            <th class="table-header-cell">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="product in products"
+            :key="product.id"
+            class="product-row transition-colors"
+            data-testid="product-row"
           >
-            <span class="product-category-text">
-              {{ capitalizeCategory(product.category) }}
-            </span>
-          </td>
-          <td class="product-price-cell px-6 py-4 align-middle min-w-[120px]">
-            <span class="product-price-text">
-              ${{ product.price.toFixed(2) }}
-            </span>
-          </td>
-          <td class="product-stock-cell px-6 py-4 align-middle min-w-[120px]">
-            <span class="product-stock-text">
-              {{ product.stock }}
-            </span>
-          </td>
-          <td class="product-actions-cell px-6 py-4 align-middle w-[150px]">
-            <ProductListActions
-              :product-id="product.id"
-              :product="product"
-              @view="$emit('view', $event)"
-              @edit="$emit('edit', $event)"
-              @delete="$emit('delete', $event)"
-            />
-          </td>
-        </tr>
-      </tbody>
+            <td class="product-image-cell px-6 py-4 align-middle">
+              <div class="product-image-wrapper w-16 h-16 flex-shrink-0">
+                <img
+                  :src="product.thumbnail"
+                  :alt="product.title"
+                  class="product-image w-full h-full rounded-md object-cover"
+                  loading="lazy"
+                  @error="handleImageError"
+                />
+              </div>
+            </td>
+            <td class="product-title-cell px-6 py-4 align-middle min-w-[200px]">
+              <span class="product-title-text">
+                {{ product.title }}
+              </span>
+            </td>
+            <td
+              class="product-category-cell px-6 py-4 align-middle min-w-[120px]"
+            >
+              <span class="product-category-text">
+                {{ capitalizeCategory(product.category) }}
+              </span>
+            </td>
+            <td class="product-price-cell px-6 py-4 align-middle min-w-[120px]">
+              <span class="product-price-text">
+                ${{ product.price.toFixed(2) }}
+              </span>
+            </td>
+            <td class="product-stock-cell px-6 py-4 align-middle min-w-[120px]">
+              <span class="product-stock-text">
+                {{ product.stock }}
+              </span>
+            </td>
+            <td class="product-actions-cell px-6 py-4 align-middle w-[150px]">
+              <ProductListActions
+                :product-id="product.id"
+                :product="product"
+                @view="$emit('view', $event)"
+                @edit="$emit('edit', $event)"
+                @delete="$emit('delete', $event)"
+              />
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>

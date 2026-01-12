@@ -1,5 +1,5 @@
-import type { Product } from './Product';
-import { DuplicateProductTitleError } from './errors';
+import { DuplicateProductTitleError } from "./errors";
+import type { Product } from "./Product";
 
 /**
  * ProductDomainService
@@ -12,7 +12,7 @@ export class ProductDomainService {
    */
   validateProductCreation(product: Product, existingProducts: Product[]): void {
     const duplicate = existingProducts.find(
-      (p) =>
+      p =>
         p.getTitle().getValue().toLowerCase() ===
         product.getTitle().getValue().toLowerCase()
     );

@@ -1,5 +1,5 @@
-import type { Product } from './Product';
-import type { ProductId } from './ProductId';
+import type { Product } from "./Product";
+import type { ProductId } from "./ProductId";
 
 /**
  * ProductRepository Interface (Domain Layer)
@@ -7,7 +7,10 @@ import type { ProductId } from './ProductId';
  */
 export interface ProductRepository {
   findById(id: ProductId): Promise<Product | null>;
-  findAll(limit?: number, skip?: number): Promise<{ products: Product[]; total: number }>;
+  findAll(
+    limit?: number,
+    skip?: number
+  ): Promise<{ products: Product[]; total: number }>;
   findByCategory(
     category: string,
     limit?: number,
@@ -21,10 +24,5 @@ export interface ProductRepository {
   save(product: Product): Promise<Product>;
   delete(id: ProductId): Promise<void>;
   exists(id: ProductId): Promise<boolean>;
-  /**
-   * Check if a product with the given title exists (case-insensitive)
-   * @param title - Product title to check
-   * @returns true if a product with this title exists, false otherwise
-   */
   existsByTitle(title: string): Promise<boolean>;
 }

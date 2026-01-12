@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
 import ProductCard from "./ProductCard.vue";
 import type { Product } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";

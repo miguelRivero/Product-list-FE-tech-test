@@ -1,4 +1,4 @@
-import { InvalidDiscountPercentageError } from './errors';
+import { InvalidDiscountPercentageError } from "./errors";
 
 /**
  * DiscountPercentage Value Object

@@ -42,7 +42,7 @@ const emit = defineEmits<{
 
 const categoryOptions = computed<CategoryOption[]>(() => {
   const allOption: CategoryOption = { label: "Category (All)", slug: null };
-  const categoryOptions: CategoryOption[] = props.categories.map((cat) => ({
+  const categoryOptions: CategoryOption[] = props.categories.map(cat => ({
     label: cat.name,
     slug: cat.slug,
   }));
@@ -51,14 +51,14 @@ const categoryOptions = computed<CategoryOption[]>(() => {
 
 const selectedValue = computed({
   get: () => props.selectedCategory,
-  set: (value) => emit("update:selectedCategory", value),
+  set: value => emit("update:selectedCategory", value),
 });
 
 const getCategoryLabel = (slug: string | null): string => {
   if (slug === null) {
     return "Category (All)";
   }
-  const category = props.categories.find((cat) => cat.slug === slug);
+  const category = props.categories.find(cat => cat.slug === slug);
   return category?.name || "Category (All)";
 };
 </script>

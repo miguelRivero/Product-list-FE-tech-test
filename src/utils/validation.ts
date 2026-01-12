@@ -29,11 +29,12 @@ export const productFormSchema = z.object({
     .int("Stock must be an integer")
     .min(0, "Stock must be 0 or greater")
     .max(999999, "Stock must be 999999 or less"),
-  category: z
+  category: z.string().min(1, "Category is required").trim(),
+  brand: z
     .string()
-    .min(1, "Category is required")
-    .trim(),
-  brand: z.string().max(100, "Brand must be 100 characters or less").trim().optional(),
+    .max(100, "Brand must be 100 characters or less")
+    .trim()
+    .optional(),
   tags: z
     .array(z.string().trim())
     .max(50, "Maximum 50 tags allowed")
@@ -60,7 +61,7 @@ export function validateProductForm(data: unknown): {
   }
 
   const errors: Record<string, string[]> = {};
-  result.error.errors.forEach((error) => {
+  result.error.errors.forEach(error => {
     const path = error.path.join(".");
     if (!errors[path]) {
       errors[path] = [];
@@ -75,8 +76,11 @@ export function validateProductForm(data: unknown): {
  * Sanitize string input (basic sanitization)
  */
 export function sanitizeString(input: string): string {
-  return input
-    .trim()
-    .replace(/[\x00-\x1F\x7F]/g, "") // Remove control characters
-    .replace(/\s+/g, " "); // Normalize whitespace
+  return (
+    input
+      .trim()
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1F\x7F]/g, "") // Remove control characters
+      .replace(/\s+/g, " ")
+  ); // Normalize whitespace
 }

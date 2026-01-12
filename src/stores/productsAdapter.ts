@@ -1,14 +1,16 @@
-import type { Product as DomainProduct } from '@/domain/product/Product';
-import type { Product as ApiProduct } from '@/types/product';
+import type { Product as DomainProduct } from "@/domain/product/Product";
+import type { Product as ApiProduct } from "@/types/product";
 
 /**
  * Adapter to convert domain Product entities to API Product type
  * This allows components to continue working with the existing Product type
  * while the store uses domain entities internally
  */
-export function domainProductToApiProduct(domainProduct: DomainProduct): ApiProduct {
+export function domainProductToApiProduct(
+  domainProduct: DomainProduct
+): ApiProduct {
   const dto = domainProduct.toDTO();
-  
+
   return {
     id: dto.id,
     title: dto.title,

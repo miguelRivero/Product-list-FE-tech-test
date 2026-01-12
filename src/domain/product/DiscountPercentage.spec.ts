@@ -25,14 +25,18 @@ describe("DiscountPercentage", () => {
     });
 
     it("throws error for negative value", () => {
-      expect(() => DiscountPercentage.create(-1)).toThrow(InvalidDiscountPercentageError);
+      expect(() => DiscountPercentage.create(-1)).toThrow(
+        InvalidDiscountPercentageError
+      );
       expect(() => DiscountPercentage.create(-1)).toThrow(
         "Discount must be between 0 and 100"
       );
     });
 
     it("throws error for value exceeding 100", () => {
-      expect(() => DiscountPercentage.create(101)).toThrow(InvalidDiscountPercentageError);
+      expect(() => DiscountPercentage.create(101)).toThrow(
+        InvalidDiscountPercentageError
+      );
       expect(() => DiscountPercentage.create(101)).toThrow(
         "Discount must be between 0 and 100"
       );

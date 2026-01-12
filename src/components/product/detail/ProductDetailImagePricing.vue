@@ -19,7 +19,7 @@
           {{ formatPrice(product.price) }}
         </span>
       </div>
-      <div class="price-item" v-if="product.discountPercentage > 0">
+      <div v-if="product.discountPercentage > 0" class="price-item">
         <span class="price-label">Discount:</span>
         <span class="price-value"> {{ product.discountPercentage }}% </span>
       </div>

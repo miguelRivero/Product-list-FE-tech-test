@@ -81,8 +81,14 @@ describe("ProductListActions", () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="view-button"]').attributes("aria-label")).toBe("View product");
-    expect(wrapper.find('[data-testid="edit-button"]').attributes("aria-label")).toBe("Edit product");
-    expect(wrapper.find('[data-testid="delete-button"]').attributes("aria-label")).toBe("Delete product");
+    expect(
+      wrapper.find('[data-testid="view-button"]').attributes("aria-label")
+    ).toBe("View product");
+    expect(
+      wrapper.find('[data-testid="edit-button"]').attributes("aria-label")
+    ).toBe("Edit product");
+    expect(
+      wrapper.find('[data-testid="delete-button"]').attributes("aria-label")
+    ).toBe("Delete product");
   });
 });

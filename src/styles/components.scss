@@ -1,3 +1,5 @@
 // Import component-specific styles
+// Note: Using @import here because variables are auto-imported via Vite's additionalData
+// The deprecation warning is expected and suppressed in vite.config.js
 @import "select";
 @import "dialog";

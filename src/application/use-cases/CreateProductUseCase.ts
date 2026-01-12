@@ -1,23 +1,19 @@
-import type { ProductRepository } from '@/domain/product/ProductRepository';
-import type { ProductDomainService } from '@/domain/product/ProductDomainService';
-import { Product } from '@/domain/product/Product';
-import { ProductId } from '@/domain/product/ProductId';
-import { ProductTitle } from '@/domain/product/ProductTitle';
-import { Money } from '@/domain/product/Money';
-import { Stock } from '@/domain/product/Stock';
-import { DiscountPercentage } from '@/domain/product/DiscountPercentage';
-import { DuplicateProductTitleError } from '@/domain/product/errors';
-import type { ProductFormData } from '@/types/product';
+import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
+import { DuplicateProductTitleError } from "@/domain/product/errors";
+import { Money } from "@/domain/product/Money";
+import { Product } from "@/domain/product/Product";
+import type { ProductFormData } from "@/types/product";
+import { ProductId } from "@/domain/product/ProductId";
+import type { ProductRepository } from "@/domain/product/ProductRepository";
+import { ProductTitle } from "@/domain/product/ProductTitle";
+import { Stock } from "@/domain/product/Stock";
 
 /**
  * CreateProductUseCase
  * Application use case for creating a new product
  */
 export class CreateProductUseCase {
-  constructor(
-    private readonly productRepository: ProductRepository,
-    private readonly productDomainService: ProductDomainService
-  ) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async execute(data: ProductFormData, clientId: number): Promise<Product> {
     // Create value objects from input data

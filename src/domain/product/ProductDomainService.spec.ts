@@ -25,7 +25,9 @@ describe("ProductDomainService", () => {
       const newProduct = createProduct(1, "New Product");
       const existingProducts: Product[] = [];
 
-      expect(() => service.validateProductCreation(newProduct, existingProducts)).not.toThrow();
+      expect(() =>
+        service.validateProductCreation(newProduct, existingProducts)
+      ).not.toThrow();
     });
 
     it("validates product creation with different titles", () => {
@@ -33,7 +35,9 @@ describe("ProductDomainService", () => {
       const newProduct = createProduct(1, "New Product");
       const existingProducts = [createProduct(2, "Existing Product")];
 
-      expect(() => service.validateProductCreation(newProduct, existingProducts)).not.toThrow();
+      expect(() =>
+        service.validateProductCreation(newProduct, existingProducts)
+      ).not.toThrow();
     });
 
     it("throws error for duplicate title (case-insensitive)", () => {
@@ -41,12 +45,12 @@ describe("ProductDomainService", () => {
       const newProduct = createProduct(1, "Test Product");
       const existingProducts = [createProduct(2, "test product")]; // Different case
 
-      expect(() => service.validateProductCreation(newProduct, existingProducts)).toThrow(
-        DuplicateProductTitleError
-      );
-      expect(() => service.validateProductCreation(newProduct, existingProducts)).toThrow(
-        'Product with title "Test Product" already exists'
-      );
+      expect(() =>
+        service.validateProductCreation(newProduct, existingProducts)
+      ).toThrow(DuplicateProductTitleError);
+      expect(() =>
+        service.validateProductCreation(newProduct, existingProducts)
+      ).toThrow('Product with title "Test Product" already exists');
     });
 
     it("throws error for duplicate title (same case)", () => {
@@ -54,9 +58,9 @@ describe("ProductDomainService", () => {
       const newProduct = createProduct(1, "Test Product");
       const existingProducts = [createProduct(2, "Test Product")];
 
-      expect(() => service.validateProductCreation(newProduct, existingProducts)).toThrow(
-        DuplicateProductTitleError
-      );
+      expect(() =>
+        service.validateProductCreation(newProduct, existingProducts)
+      ).toThrow(DuplicateProductTitleError);
     });
 
     it("allows products with similar but not identical titles", () => {
@@ -64,7 +68,9 @@ describe("ProductDomainService", () => {
       const newProduct = createProduct(1, "Test Product");
       const existingProducts = [createProduct(2, "Test Product 2")];
 
-      expect(() => service.validateProductCreation(newProduct, existingProducts)).not.toThrow();
+      expect(() =>
+        service.validateProductCreation(newProduct, existingProducts)
+      ).not.toThrow();
     });
   });
 });

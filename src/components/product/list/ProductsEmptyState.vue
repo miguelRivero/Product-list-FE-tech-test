@@ -4,9 +4,7 @@
       <i class="pi pi-inbox" />
     </div>
     <h3 class="empty-title">No products found</h3>
-    <p class="empty-message">
-      Try adjusting your search or filter criteria
-    </p>
+    <p class="empty-message">Try adjusting your search or filter criteria</p>
   </div>
 </template>
 
@@ -44,4 +42,3 @@
   margin: 0;
 }
 </style>
-

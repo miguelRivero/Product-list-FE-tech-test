@@ -16,7 +16,10 @@ class APICache {
   /**
    * Generate cache key from endpoint and params
    */
-  private getCacheKey(endpoint: string, params?: Record<string, unknown>): string {
+  private getCacheKey(
+    endpoint: string,
+    params?: Record<string, unknown>
+  ): string {
     if (!params || Object.keys(params).length === 0) {
       return endpoint;
     }

@@ -30,7 +30,7 @@ import Select from "primevue/select";
 
 interface Props {
   modelValue: string | number | null;
-  options: Array<Record<string, any>>;
+  options: Array<Record<string, unknown>>;
   optionLabel?: string;
   optionValue?: string;
   placeholder?: string;
@@ -60,7 +60,7 @@ const emit = defineEmits<{
 
 const selectedValue = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
+  set: value => emit("update:modelValue", value),
 });
 
 const getLabel = (value: string | number | null): string => {
@@ -72,7 +72,7 @@ const getLabel = (value: string | number | null): string => {
     return props.getLabel(value);
   }
 
-  const option = props.options.find((opt) => opt[props.optionValue] === value);
+  const option = props.options.find(opt => opt[props.optionValue] === value);
   return option?.[props.optionLabel] || "";
 };
 </script>

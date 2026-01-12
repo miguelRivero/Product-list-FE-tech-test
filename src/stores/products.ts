@@ -43,8 +43,8 @@ export const useProductsStore = defineStore("products", () => {
     pageSize.value = limit;
 
     try {
-      const useCase = diContainer.getProductsUseCase();
-      const result = await useCase.execute(
+      const getProductsUseCase = diContainer.getProductsUseCase();
+      const result = await getProductsUseCase.execute(
         page,
         limit,
         selectedCategory.value || undefined,
@@ -89,8 +89,8 @@ export const useProductsStore = defineStore("products", () => {
         selectedProduct.value = cached;
         logger.debug("Using cached product", { id });
       } else {
-        const useCase = diContainer.getProductUseCase();
-        const domainProduct = await useCase.execute(id);
+        const getProductUseCase = diContainer.getProductUseCase();
+        const domainProduct = await getProductUseCase.execute(id);
         const apiProduct = domainProductToApiProduct(domainProduct);
         selectedProduct.value = apiProduct;
         // Cache for 10 minutes
@@ -170,8 +170,11 @@ export const useProductsStore = defineStore("products", () => {
       const clientId = generateSecureClientId();
 
       // Use case handles domain logic and validation
-      const useCase = diContainer.getCreateProductUseCase();
-      const domainProduct = await useCase.execute(productData, clientId);
+      const createProductUseCase = diContainer.getCreateProductUseCase();
+      const domainProduct = await createProductUseCase.execute(
+        productData,
+        clientId
+      );
 
       // Convert to API Product type
       const newProduct = domainProductToApiProduct(domainProduct);
@@ -269,8 +272,9 @@ export const useProductsStore = defineStore("products", () => {
 
     try {
       // Use case handles domain logic
-      const useCase = diContainer.getUpdateProductUseCase();
-      const domainProduct = await useCase.execute(id, updates);
+      // Línea 272-273
+      const updateProductUseCase = diContainer.getUpdateProductUseCase();
+      const domainProduct = await updateProductUseCase.execute(id, updates);
 
       // Convert to API Product type
       const updatedProduct = domainProductToApiProduct(domainProduct);
@@ -351,8 +355,8 @@ export const useProductsStore = defineStore("products", () => {
 
     try {
       // Use case handles domain logic
-      const useCase = diContainer.getDeleteProductUseCase();
-      await useCase.execute(id);
+      const deleteProductUseCase = diContainer.getDeleteProductUseCase();
+      await deleteProductUseCase.execute(id);
 
       // Invalidate caches
       apiCache.invalidate(`/products/${id}`);

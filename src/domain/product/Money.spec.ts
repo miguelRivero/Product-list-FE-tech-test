@@ -33,13 +33,17 @@ describe("Money", () => {
 
     it("throws error for Infinity", () => {
       expect(() => Money.create(Infinity)).toThrow(InvalidMoneyError);
-      expect(() => Money.create(Infinity)).toThrow("Money amount must be finite");
+      expect(() => Money.create(Infinity)).toThrow(
+        "Money amount must be finite"
+      );
     });
 
     it("throws error for -Infinity", () => {
       expect(() => Money.create(-Infinity)).toThrow(InvalidMoneyError);
       // -Infinity is negative, so it throws negative error first
-      expect(() => Money.create(-Infinity)).toThrow("Money amount cannot be negative");
+      expect(() => Money.create(-Infinity)).toThrow(
+        "Money amount cannot be negative"
+      );
     });
 
     it("throws error for NaN", () => {

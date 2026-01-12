@@ -4,7 +4,9 @@ test.describe("Product List", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     // Wait for products to load
-    await page.waitForSelector('[data-testid="products-table"]', { timeout: 10000 });
+    await page.waitForSelector('[data-testid="products-table"]', {
+      timeout: 10000,
+    });
   });
 
   test("displays product list", async ({ page }) => {
@@ -21,8 +23,10 @@ test.describe("Product List", () => {
     await searchInput.fill("phone");
 
     // Wait for table to update after debounce and API call
-    await page.waitForSelector('[data-testid="products-table"]', { state: "visible" });
-    
+    await page.waitForSelector('[data-testid="products-table"]', {
+      state: "visible",
+    });
+
     // Wait for products to be loaded (ensure API call completed)
     await page.waitForLoadState("networkidle");
 
@@ -32,7 +36,10 @@ test.describe("Product List", () => {
   });
 
   test("views product detail", async ({ page }) => {
-    const viewButton = page.getByTestId("product-row").first().getByTestId("view-button");
+    const viewButton = page
+      .getByTestId("product-row")
+      .first()
+      .getByTestId("view-button");
     await viewButton.click();
 
     // Should navigate to product detail page

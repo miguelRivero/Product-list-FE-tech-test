@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Dialog styles - must be global because Dialog renders in a portal
 .product-dialog {
   .p-dialog-header {
@@ -95,7 +97,7 @@
     color: white;
 
     &:hover {
-      background-color: darken($primary, 5%);
+      background-color: color.adjust($primary, $lightness: -5%);
     }
   }
 }
@@ -175,7 +177,7 @@
   color: white;
 
   &:hover:not(:disabled) {
-    background-color: darken($danger, 5%);
+    background-color: color.adjust($danger, $lightness: -5%);
   }
 
   &:disabled {

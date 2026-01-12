@@ -35,7 +35,7 @@ describe("APICache", () => {
     apiCache.set("/products", testData, undefined, 100); // 100ms TTL
 
     // Wait for cache to expire
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    await new Promise(resolve => setTimeout(resolve, 150));
 
     const result = apiCache.get("/products");
 

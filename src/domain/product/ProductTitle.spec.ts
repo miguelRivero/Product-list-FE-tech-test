@@ -23,17 +23,25 @@ describe("ProductTitle", () => {
 
     it("throws error for empty string", () => {
       expect(() => ProductTitle.create("")).toThrow(InvalidProductTitleError);
-      expect(() => ProductTitle.create("")).toThrow("Product title cannot be empty");
+      expect(() => ProductTitle.create("")).toThrow(
+        "Product title cannot be empty"
+      );
     });
 
     it("throws error for whitespace-only string", () => {
-      expect(() => ProductTitle.create("   ")).toThrow(InvalidProductTitleError);
-      expect(() => ProductTitle.create("   ")).toThrow("Product title cannot be empty");
+      expect(() => ProductTitle.create("   ")).toThrow(
+        InvalidProductTitleError
+      );
+      expect(() => ProductTitle.create("   ")).toThrow(
+        "Product title cannot be empty"
+      );
     });
 
     it("throws error for title exceeding 200 characters", () => {
       const tooLongTitle = "a".repeat(201);
-      expect(() => ProductTitle.create(tooLongTitle)).toThrow(InvalidProductTitleError);
+      expect(() => ProductTitle.create(tooLongTitle)).toThrow(
+        InvalidProductTitleError
+      );
       expect(() => ProductTitle.create(tooLongTitle)).toThrow(
         "Product title cannot exceed 200 characters"
       );

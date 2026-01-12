@@ -1,7 +1,5 @@
 import type { Product } from "@/types/product";
-import { useConfirm } from "primevue/useconfirm";
 import { useRouter } from "vue-router";
-import { useToast } from "primevue/usetoast";
 
 /**
  * Composable for product action handlers
@@ -15,7 +13,7 @@ export function useProductActions() {
   };
 
   const editProduct = (id: number, products: Product[]): Product | null => {
-    return products.find((p) => p.id === id) || null;
+    return products.find(p => p.id === id) || null;
   };
 
   return {

@@ -1,4 +1,4 @@
-import { InvalidStockError } from './errors';
+import { InvalidStockError } from "./errors";
 
 /**
  * Stock Value Object

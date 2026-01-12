@@ -46,7 +46,7 @@ const pageTitle = computed(() => {
     }
 
     // Otherwise, try to find it in the products list
-    const productFromList = store.products.find((p) => p.id === productId);
+    const productFromList = store.products.find(p => p.id === productId);
     if (productFromList) {
       return productFromList.title;
     }

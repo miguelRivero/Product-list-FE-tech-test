@@ -1,15 +1,25 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { describe, it, expect } from "vitest";
 import ProductForm from "./ProductForm.vue";
-import type { Product, Category } from "@/types/product";
+import type { Product, Category, ProductFormData } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
 
+// Type for component instance with exposed methods and properties
+type ProductFormInstance = {
+  submitForm: () => void;
+  formData: ProductFormData;
+  validationErrors: Record<string, string[]>;
+};
+
 // Helper to flush all pending promises and watchers
-const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
+const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
 describe("ProductForm", () => {
   const mockCategories: Category[] = [
-    { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+    {
+      slug: "electronics",
+      name: "Electronics",
+      url: "/categories/electronics",
+    },
     { slug: "beauty", name: "Beauty", url: "/categories/beauty" },
   ];
 
@@ -35,12 +45,24 @@ describe("ProductForm", () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="product-title-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="product-description-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="product-price-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="product-discount-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="product-category-select"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="product-stock-input"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="product-title-input"]').exists()).toBe(
+      true
+    );
+    expect(
+      wrapper.find('[data-testid="product-description-input"]').exists()
+    ).toBe(true);
+    expect(wrapper.find('[data-testid="product-price-input"]').exists()).toBe(
+      true
+    );
+    expect(
+      wrapper.find('[data-testid="product-discount-input"]').exists()
+    ).toBe(true);
+    expect(
+      wrapper.find('[data-testid="product-category-select"]').exists()
+    ).toBe(true);
+    expect(wrapper.find('[data-testid="product-stock-input"]').exists()).toBe(
+      true
+    );
   });
 
   it("populates form fields when product prop is provided", async () => {
@@ -90,8 +112,8 @@ describe("ProductForm", () => {
     await wrapper.vm.$nextTick();
 
     // Fill form fields by setting values directly on the component
-    const formComponent = wrapper.vm as any;
-    
+    const formComponent = wrapper.vm as unknown as ProductFormInstance;
+
     // Set form data via component's reactive formData
     formComponent.formData.title = "New Product";
     formComponent.formData.description = "New description";
@@ -121,14 +143,16 @@ describe("ProductForm", () => {
     await wrapper.vm.$nextTick();
 
     // Leave form empty (invalid - title is empty)
-    const formComponent = wrapper.vm as any;
+    const formComponent = wrapper.vm as unknown as ProductFormInstance;
     formComponent.submitForm();
     await wrapper.vm.$nextTick();
 
     // Form should not emit submit when invalid
     expect(wrapper.emitted("submit")).toBeFalsy();
     // Validation errors should be set
-    expect(Object.keys(formComponent.validationErrors).length).toBeGreaterThan(0);
+    expect(Object.keys(formComponent.validationErrors).length).toBeGreaterThan(
+      0
+    );
   });
 
   it("exposes submitForm method", () => {
@@ -138,7 +162,7 @@ describe("ProductForm", () => {
       },
     });
 
-    const formComponent = wrapper.vm as any;
+    const formComponent = wrapper.vm as unknown as ProductFormInstance;
     expect(typeof formComponent.submitForm).toBe("function");
   });
 
@@ -156,6 +180,8 @@ describe("ProductForm", () => {
     await wrapper.vm.$nextTick();
 
     // Verify the input value was updated
-    expect((titleInput.element as HTMLInputElement).value).toBe("Updated Title");
+    expect((titleInput.element as HTMLInputElement).value).toBe(
+      "Updated Title"
+    );
   });
 });

@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
@@ -117,7 +117,6 @@ const {
   setError,
   setSuccess,
   clearMessages,
-  handleDialogClose: dialogCloseHandler,
 } = dialogState;
 
 const { slugToName } = useCategory(categories);

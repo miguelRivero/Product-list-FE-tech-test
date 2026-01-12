@@ -153,7 +153,9 @@ describe("sanitizeString", () => {
   });
 
   it("normalizes whitespace", () => {
-    expect(sanitizeString("test    multiple    spaces")).toBe("test multiple spaces");
+    expect(sanitizeString("test    multiple    spaces")).toBe(
+      "test multiple spaces"
+    );
   });
 
   it("handles empty string", () => {

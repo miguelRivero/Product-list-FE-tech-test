@@ -1,6 +1,9 @@
 <template>
   <form class="product-form" @submit.prevent="handleSubmit">
-    <div v-if="Object.keys(validationErrors).length > 0" class="form-validation-errors">
+    <div
+      v-if="Object.keys(validationErrors).length > 0"
+      class="form-validation-errors"
+    >
       <Message severity="error" :closable="false">
         <ul class="validation-errors-list">
           <li v-for="(errors, field) in validationErrors" :key="field">
@@ -20,7 +23,9 @@
         required
         data-testid="product-title-input"
       />
-      <small v-if="validationErrors.title" class="p-error">{{ validationErrors.title[0] }}</small>
+      <small v-if="validationErrors.title" class="p-error">{{
+        validationErrors.title[0]
+      }}</small>
     </div>
 
     <div class="form-field">
@@ -34,7 +39,9 @@
         required
         data-testid="product-description-input"
       />
-      <small v-if="validationErrors.description" class="p-error">{{ validationErrors.description[0] }}</small>
+      <small v-if="validationErrors.description" class="p-error">{{
+        validationErrors.description[0]
+      }}</small>
     </div>
 
     <div class="form-row">
@@ -52,7 +59,9 @@
           required
           data-testid="product-price-input"
         />
-        <small v-if="validationErrors.price" class="p-error">{{ validationErrors.price[0] }}</small>
+        <small v-if="validationErrors.price" class="p-error">{{
+          validationErrors.price[0]
+        }}</small>
       </div>
 
       <div class="form-field">
@@ -70,7 +79,9 @@
           suffix="%"
           data-testid="product-discount-input"
         />
-        <small v-if="validationErrors.discountPercentage" class="p-error">{{ validationErrors.discountPercentage[0] }}</small>
+        <small v-if="validationErrors.discountPercentage" class="p-error">{{
+          validationErrors.discountPercentage[0]
+        }}</small>
       </div>
     </div>
 
@@ -88,7 +99,9 @@
         required
         data-testid="product-category-select"
       />
-      <small v-if="validationErrors.category" class="p-error">{{ validationErrors.category[0] }}</small>
+      <small v-if="validationErrors.category" class="p-error">{{
+        validationErrors.category[0]
+      }}</small>
     </div>
 
     <div class="form-field">
@@ -102,7 +115,9 @@
         required
         data-testid="product-stock-input"
       />
-      <small v-if="validationErrors.stock" class="p-error">{{ validationErrors.stock[0] }}</small>
+      <small v-if="validationErrors.stock" class="p-error">{{
+        validationErrors.stock[0]
+      }}</small>
     </div>
   </form>
 </template>
@@ -143,7 +158,7 @@ const validationErrors = ref<Record<string, string[]>>({});
 // Populate form when editing
 watch(
   () => props.product,
-  (product) => {
+  product => {
     if (product) {
       formData.title = sanitizeString(product.title);
       formData.description = sanitizeString(product.description);
@@ -173,7 +188,7 @@ watch(
 const handleSubmit = () => {
   // Validate form data
   const validation = validateProductForm(formData);
-  
+
   if (!validation.success) {
     validationErrors.value = validation.errors || {};
     return;
@@ -326,7 +341,7 @@ defineExpose({
 .validation-errors-list {
   margin: 0;
   padding-left: 1.5rem;
-  
+
   li {
     margin-bottom: 0.25rem;
   }

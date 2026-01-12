@@ -1,12 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
 import ProductCategoriesSelect from "./ProductCategoriesSelect.vue";
 import type { Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
 
 describe("ProductCategoriesSelect", () => {
   const mockCategories: Category[] = [
-    { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+    {
+      slug: "electronics",
+      name: "Electronics",
+      url: "/categories/electronics",
+    },
     { slug: "beauty", name: "Beauty", url: "/categories/beauty" },
   ];
 
@@ -46,7 +49,9 @@ describe("ProductCategoriesSelect", () => {
     await select.setValue("electronics");
 
     expect(wrapper.emitted("update:selectedCategory")).toBeTruthy();
-    expect(wrapper.emitted("update:selectedCategory")?.[0]).toEqual(["electronics"]);
+    expect(wrapper.emitted("update:selectedCategory")?.[0]).toEqual([
+      "electronics",
+    ]);
   });
 
   it("displays selected category", () => {

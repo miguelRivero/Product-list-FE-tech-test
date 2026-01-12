@@ -1,9 +1,5 @@
 <template>
-  <Message
-    severity="error"
-    :closable="true"
-    @close="$emit('close')"
-  >
+  <Message severity="error" :closable="true" @close="$emit('close')">
     {{ error }}
   </Message>
 </template>
@@ -19,4 +15,3 @@ defineEmits<{
   close: [];
 }>();
 </script>
-

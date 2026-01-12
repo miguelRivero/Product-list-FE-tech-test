@@ -172,7 +172,9 @@ describe("Product", () => {
       const product = createValidProduct();
       const longDescription = "a".repeat(5001);
 
-      expect(() => product.updateDescription(longDescription)).toThrow(InvalidProductError);
+      expect(() => product.updateDescription(longDescription)).toThrow(
+        InvalidProductError
+      );
     });
   });
 

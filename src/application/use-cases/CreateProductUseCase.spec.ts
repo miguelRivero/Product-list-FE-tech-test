@@ -1,19 +1,18 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { CreateProductUseCase } from "./CreateProductUseCase";
-import type { ProductRepository } from "@/domain/product/ProductRepository";
-import type { ProductDomainService } from "@/domain/product/ProductDomainService";
-import { Product } from "@/domain/product/Product";
-import { ProductId } from "@/domain/product/ProductId";
-import { ProductTitle } from "@/domain/product/ProductTitle";
-import { Money } from "@/domain/product/Money";
-import { Stock } from "@/domain/product/Stock";
 import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
 import { DuplicateProductTitleError } from "@/domain/product/errors";
+import { Money } from "@/domain/product/Money";
+import { Product } from "@/domain/product/Product";
 import type { ProductFormData } from "@/types/product";
+import { ProductId } from "@/domain/product/ProductId";
+import type { ProductRepository } from "@/domain/product/ProductRepository";
+import { ProductTitle } from "@/domain/product/ProductTitle";
+import { Stock } from "@/domain/product/Stock";
 
 describe("CreateProductUseCase", () => {
   let mockRepository: ProductRepository;
-  let mockDomainService: ProductDomainService;
   let useCase: CreateProductUseCase;
 
   beforeEach(() => {
@@ -29,15 +28,12 @@ describe("CreateProductUseCase", () => {
       existsByTitle: vi.fn(),
     };
 
-    // Create mock domain service
-    mockDomainService = {
-      validateProductCreation: vi.fn(),
-    };
-
-    useCase = new CreateProductUseCase(mockRepository, mockDomainService);
+    useCase = new CreateProductUseCase(mockRepository);
   });
 
-  const createMockProductFormData = (overrides?: Partial<ProductFormData>): ProductFormData => ({
+  const createMockProductFormData = (
+    overrides?: Partial<ProductFormData>
+  ): ProductFormData => ({
     title: "Test Product",
     description: "Test description",
     price: 99.99,
@@ -58,7 +54,9 @@ describe("CreateProductUseCase", () => {
       description: formData.description,
       category: formData.category,
       price: Money.create(formData.price),
-      discountPercentage: DiscountPercentage.create(formData.discountPercentage!),
+      discountPercentage: DiscountPercentage.create(
+        formData.discountPercentage!
+      ),
       stock: Stock.create(formData.stock),
       tags: formData.tags,
     });
@@ -88,7 +86,9 @@ describe("CreateProductUseCase", () => {
   });
 
   it("handles product without discount percentage", async () => {
-    const formData = createMockProductFormData({ discountPercentage: undefined });
+    const formData = createMockProductFormData({
+      discountPercentage: undefined,
+    });
     const clientId = 12345;
 
     const mockSavedProduct = Product.create({

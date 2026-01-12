@@ -5,7 +5,11 @@ import type { Category } from "@/types/product";
 
 describe("useCategory", () => {
   const mockCategories = ref<Category[]>([
-    { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+    {
+      slug: "electronics",
+      name: "Electronics",
+      url: "/categories/electronics",
+    },
     { slug: "beauty", name: "Beauty", url: "/categories/beauty" },
     { slug: "furniture", name: "Furniture", url: "/categories/furniture" },
   ]);
@@ -13,7 +17,11 @@ describe("useCategory", () => {
   beforeEach(() => {
     // Reset categories
     mockCategories.value = [
-      { slug: "electronics", name: "Electronics", url: "/categories/electronics" },
+      {
+        slug: "electronics",
+        name: "Electronics",
+        url: "/categories/electronics",
+      },
       { slug: "beauty", name: "Beauty", url: "/categories/beauty" },
       { slug: "furniture", name: "Furniture", url: "/categories/furniture" },
     ];
