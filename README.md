@@ -15,14 +15,20 @@ Product management application built with Vue 3, TypeScript, and PrimeVue.
 
 ```
 src/
-├── assets/          # Static assets (images, logos)
-├── composables/     # Reusable composition functions
-├── router/          # Vue Router configuration
-├── services/        # API service layer
-├── stores/          # Pinia stores
-├── styles/          # Global styles and SCSS variables
-├── types/           # TypeScript type definitions
-└── views/           # Route components
+├── application/ # Application layer (use cases)
+├── assets/ # Static assets (images, logos)
+├── components/ # Vue components (organized by feature)
+├── composables/ # Reusable composition functions
+├── domain/ # Domain layer (entities, value objects)
+├── infrastructure/ # Infrastructure layer (repositories, DI)
+├── router/ # Vue Router configuration
+├── services/ # API service layer
+├── stores/ # Pinia stores
+├── styles/ # Global styles and SCSS variables
+├── test-utils/ # Testing utilities and helpers
+├── types/ # TypeScript type definitions
+├── utils/ # Utility functions
+└── views/ # Route components
 ```
 
 ## Getting Started
@@ -68,14 +74,15 @@ The application calls DummyJSON API directly from the frontend.
 
 ## Architecture
 
-The application follows a layered architecture:
+TThe application follows Domain-Driven Design (DDD) with a layered architecture:
 
-1. **API Service Layer** (`src/services/api.ts`) - Abstracts API calls
-2. **Pinia Store** (`src/stores/products.ts`) - Global state management
-3. **Composables** (`src/composables/`) - Reusable logic
-4. **Components** (`src/views/`) - UI components
-
-See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture documentation.
+1. **Presentation Layer** (`src/components/`, `src/views/`) - Vue components and views
+2. **Composables** (`src/composables/`) - Reusable reactive logic
+3. **State Management** (`src/stores/`) - Pinia stores for global state
+4. **Application Layer** (`src/application/use-cases/`) - Use cases orchestrate business logic
+5. **Domain Layer** (`src/domain/`) - Business logic, entities, and value objects
+6. **Infrastructure Layer** (`src/infrastructure/`) - Repository implementations and DI container
+7. **API Service** (`src/services/`) - External API communication
 
 ## Key Features
 
@@ -87,14 +94,6 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 - ✅ Optimistic updates (handles DummyJSON limitations)
 - ✅ Responsive design
 
-## Documentation
-
-- [Architecture Decisions](./docs/ARCHITECTURE.md)
-- [API Documentation](./docs/API.md)
-- [Testing Strategy](./docs/TESTING.md)
-- [DDD Implementation](./docs/DDD_IMPLEMENTATION.md)
-- [Agents Guide](./docs/agents.md)
-
 ## Notes
 
-⚠️ **Important**: DummyJSON API does NOT persist POST/PUT/DELETE operations. The application simulates persistence in the frontend state using optimistic updates. See [docs/API.md](./docs/API.md) for details.
+⚠️ **Important**: DummyJSON API does NOT persist POST/PUT/DELETE operations. The application simulates persistence in the frontend state using optimistic updates.
