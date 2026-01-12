@@ -40,13 +40,19 @@ export class ProductRepositoryImpl implements ProductRepository {
     };
   }
 
+  private handleError(error: unknown, message: string): void {
+    const errorInstance =
+      error instanceof Error ? error : new Error(String(error));
+    logger.error(message, errorInstance);
+  }
+
   async findById(id: ProductId): Promise<Product | null> {
     try {
       const apiProduct = await productsApi.getProduct(id.getValue());
       const dto = this.convertApiProductToDTO(apiProduct);
       return ProductEntity.fromDTO(dto);
     } catch (error) {
-      logger.error("Error fetching product", error);
+      this.handleError(error, "Error fetching product");
       return null;
     }
   }
@@ -66,7 +72,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         total: response.total,
       };
     } catch (error) {
-      logger.error("Error fetching products", error);
+      this.handleError(error, "Error fetching products");
       throw error;
     }
   }
@@ -91,7 +97,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         total: response.total,
       };
     } catch (error) {
-      logger.error("Error fetching products by category", error);
+      this.handleError(error, "Error fetching products by category");
       throw error;
     }
   }
@@ -112,7 +118,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         total: response.total,
       };
     } catch (error) {
-      logger.error("Error searching products", error);
+      this.handleError(error, "Error searching products");
       throw error;
     }
   }
@@ -150,7 +156,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         return product;
       }
     } catch (error) {
-      logger.error("Error saving product", error);
+      this.handleError(error, "Error saving product");
       throw error;
     }
   }
@@ -159,7 +165,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     try {
       await productsApi.deleteProduct(id.getValue());
     } catch (error) {
-      logger.error("Error deleting product", error);
+      this.handleError(error, "Error deleting product");
       throw error;
     }
   }
@@ -180,7 +186,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         product => product.title.toLowerCase() === title.toLowerCase()
       );
     } catch (error) {
-      logger.error("Error checking if product title exists", error);
+      this.handleError(error, "Error checking if product title exists");
       // On error, assume it doesn't exist to avoid blocking creation
       return false;
     }
