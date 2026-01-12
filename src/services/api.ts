@@ -6,19 +6,17 @@ import type {
 } from "@/types/product";
 import axios, { AxiosError, AxiosInstance } from "axios";
 
+import { API_CONFIG } from "@/utils/constants";
 import type { ApiErrorData } from "@/types/api";
 import { logger } from "@/utils/logger";
 
-// API base URL - DummyJSON API
-const API_BASE_URL = "https://dummyjson.com";
-
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  // Timeout configurable via environment variable, default 10 seconds
-  timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
+  baseURL: API_CONFIG.BASE_URL,
+  timeout:
+    Number(import.meta.env.VITE_API_TIMEOUT) || API_CONFIG.DEFAULT_TIMEOUT,
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": API_CONFIG.CONTENT_TYPE,
   },
 });
 

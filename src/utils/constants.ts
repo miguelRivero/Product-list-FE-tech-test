@@ -30,3 +30,10 @@ export const DEFAULT_PAGE_SIZE = 10;
 
 // Default page number
 export const DEFAULT_PAGE = 1;
+
+// API Configuration
+export const API_CONFIG = {
+  BASE_URL: "https://dummyjson.com",
+  DEFAULT_TIMEOUT: 10000, // 10 seconds
+  CONTENT_TYPE: "application/json",
+};
