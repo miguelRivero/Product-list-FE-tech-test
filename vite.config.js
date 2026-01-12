@@ -15,6 +15,10 @@ export default defineConfig({
       scss: {
         // Auto-import variables in all components
         additionalData: `@import "@/styles/_variables.scss";`,
+        // Suppress Sass deprecation warnings
+        // These warnings are expected for @import in additionalData (Vite standard pattern)
+        // and legacy-js-api (Vite uses legacy API internally)
+        silenceDeprecations: ["legacy-js-api", "import"],
       },
     },
   },
