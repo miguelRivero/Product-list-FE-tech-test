@@ -168,4 +168,21 @@ export class ProductRepositoryImpl implements ProductRepository {
     const product = await this.findById(id);
     return product !== null;
   }
+
+  async existsByTitle(title: string): Promise<boolean> {
+    try {
+      // Use search API to find products by title (case-insensitive)
+      // DummyJSON search is case-insensitive by default
+      const response = await productsApi.searchProducts(title, 1, 0);
+
+      // Check if any product matches the title exactly (case-insensitive)
+      return response.products.some(
+        product => product.title.toLowerCase() === title.toLowerCase()
+      );
+    } catch (error) {
+      logger.error("Error checking if product title exists", error);
+      // On error, assume it doesn't exist to avoid blocking creation
+      return false;
+    }
+  }
 }

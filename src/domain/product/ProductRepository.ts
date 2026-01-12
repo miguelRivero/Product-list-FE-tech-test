@@ -21,4 +21,10 @@ export interface ProductRepository {
   save(product: Product): Promise<Product>;
   delete(id: ProductId): Promise<void>;
   exists(id: ProductId): Promise<boolean>;
+  /**
+   * Check if a product with the given title exists (case-insensitive)
+   * @param title - Product title to check
+   * @returns true if a product with this title exists, false otherwise
+   */
+  existsByTitle(title: string): Promise<boolean>;
 }

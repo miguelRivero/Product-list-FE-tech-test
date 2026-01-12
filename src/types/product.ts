@@ -4,13 +4,19 @@ export interface Category {
   url: string;
 }
 
+/**
+ * Product interface - represents a product from the API
+ * This type matches the DummyJSON API response structure
+ */
 export interface Product {
   id: number;
   title: string;
+  /** Required: Description cannot be empty (validated in domain layer) */
   description: string;
   category: string;
   price: number;
   discountPercentage: number;
+  /** Rating value (0-5), defaults to 0 if not provided in domain layer */
   rating: number;
   stock: number;
   tags?: string[];

@@ -1,8 +1,11 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import ProductForm from "./ProductForm.vue";
 import type { Product, Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+// Helper to flush all pending promises and watchers
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe("ProductForm", () => {
   const mockCategories: Category[] = [
@@ -49,8 +52,10 @@ describe("ProductForm", () => {
       },
     });
 
+    // Wait for initial render and watchers to execute
     await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Wait for watch to execute
+    await flushPromises();
+    await wrapper.vm.$nextTick();
 
     const titleInput = wrapper.find('[data-testid="product-title-input"]');
     expect((titleInput.element as HTMLInputElement).value).toBe(product.title);
@@ -66,8 +71,10 @@ describe("ProductForm", () => {
 
     await wrapper.vm.$nextTick();
     await wrapper.setProps({ product: null });
+    // Wait for watcher to react to prop change
     await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Wait for watch to execute
+    await flushPromises();
+    await wrapper.vm.$nextTick();
 
     const titleInput = wrapper.find('[data-testid="product-title-input"]');
     expect((titleInput.element as HTMLInputElement).value).toBe("");

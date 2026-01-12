@@ -26,6 +26,7 @@ describe("CreateProductUseCase", () => {
       save: vi.fn(),
       delete: vi.fn(),
       exists: vi.fn(),
+      existsByTitle: vi.fn(),
     };
 
     // Create mock domain service
@@ -51,7 +52,6 @@ describe("CreateProductUseCase", () => {
     const formData = createMockProductFormData();
     const clientId = 12345;
 
-    const mockExistingProducts = { products: [], total: 0 };
     const mockSavedProduct = Product.create({
       id: ProductId.createClientId(clientId),
       title: ProductTitle.create(formData.title),
@@ -63,17 +63,12 @@ describe("CreateProductUseCase", () => {
       tags: formData.tags,
     });
 
-    vi.mocked(mockRepository.findAll).mockResolvedValue(mockExistingProducts);
-    vi.mocked(mockDomainService.validateProductCreation).mockReturnValue(undefined);
+    vi.mocked(mockRepository.existsByTitle).mockResolvedValue(false);
     vi.mocked(mockRepository.save).mockResolvedValue(mockSavedProduct);
 
     const result = await useCase.execute(formData, clientId);
 
-    expect(mockRepository.findAll).toHaveBeenCalledWith(1000, 0);
-    expect(mockDomainService.validateProductCreation).toHaveBeenCalledWith(
-      expect.any(Product),
-      []
-    );
+    expect(mockRepository.existsByTitle).toHaveBeenCalledWith(formData.title);
     expect(mockRepository.save).toHaveBeenCalledWith(expect.any(Product));
     expect(result).toBe(mockSavedProduct);
   });
@@ -82,26 +77,13 @@ describe("CreateProductUseCase", () => {
     const formData = createMockProductFormData();
     const clientId = 12345;
 
-    const existingProduct = Product.create({
-      id: ProductId.create(1),
-      title: ProductTitle.create(formData.title),
-      description: "Existing product",
-      category: "electronics",
-      price: Money.create(50),
-      stock: Stock.create(10),
-    });
-
-    const mockExistingProducts = { products: [existingProduct], total: 1 };
-
-    vi.mocked(mockRepository.findAll).mockResolvedValue(mockExistingProducts);
-    vi.mocked(mockDomainService.validateProductCreation).mockImplementation(() => {
-      throw new DuplicateProductTitleError("Product title already exists");
-    });
+    vi.mocked(mockRepository.existsByTitle).mockResolvedValue(true);
 
     await expect(useCase.execute(formData, clientId)).rejects.toThrow(
       DuplicateProductTitleError
     );
 
+    expect(mockRepository.existsByTitle).toHaveBeenCalledWith(formData.title);
     expect(mockRepository.save).not.toHaveBeenCalled();
   });
 
@@ -109,7 +91,6 @@ describe("CreateProductUseCase", () => {
     const formData = createMockProductFormData({ discountPercentage: undefined });
     const clientId = 12345;
 
-    const mockExistingProducts = { products: [], total: 0 };
     const mockSavedProduct = Product.create({
       id: ProductId.createClientId(clientId),
       title: ProductTitle.create(formData.title),
@@ -119,8 +100,7 @@ describe("CreateProductUseCase", () => {
       stock: Stock.create(formData.stock),
     });
 
-    vi.mocked(mockRepository.findAll).mockResolvedValue(mockExistingProducts);
-    vi.mocked(mockDomainService.validateProductCreation).mockReturnValue(undefined);
+    vi.mocked(mockRepository.existsByTitle).mockResolvedValue(false);
     vi.mocked(mockRepository.save).mockResolvedValue(mockSavedProduct);
 
     const result = await useCase.execute(formData, clientId);
@@ -132,7 +112,6 @@ describe("CreateProductUseCase", () => {
     const formData = createMockProductFormData({ tags: undefined });
     const clientId = 12345;
 
-    const mockExistingProducts = { products: [], total: 0 };
     const mockSavedProduct = Product.create({
       id: ProductId.createClientId(clientId),
       title: ProductTitle.create(formData.title),
@@ -142,8 +121,7 @@ describe("CreateProductUseCase", () => {
       stock: Stock.create(formData.stock),
     });
 
-    vi.mocked(mockRepository.findAll).mockResolvedValue(mockExistingProducts);
-    vi.mocked(mockDomainService.validateProductCreation).mockReturnValue(undefined);
+    vi.mocked(mockRepository.existsByTitle).mockResolvedValue(false);
     vi.mocked(mockRepository.save).mockResolvedValue(mockSavedProduct);
 
     const result = await useCase.execute(formData, clientId);
