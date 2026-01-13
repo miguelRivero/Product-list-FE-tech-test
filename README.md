@@ -84,6 +84,18 @@ TThe application follows Domain-Driven Design (DDD) with a layered architecture:
 6. **Infrastructure Layer** (`src/infrastructure/`) - Repository implementations and DI container
 7. **API Service** (`src/services/`) - External API communication
 
+## Highlights for Reviewers
+
+- ✨ **Clean Architecture**: Strict layer separation (Domain → Application → Infrastructure)
+- 🎯 **222+ Unit Tests**: Comprehensive test coverage with Vitest
+- 🔄 **Optimistic UI**: Handles API limitations with smart state management
+- 🏗️ **DDD Patterns**: Value Objects, Entities, Repositories, Use Cases
+- 📦 **Dependency Injection**: Centralized container for testability
+- 🎨 **PrimeVue + Tailwind**: Modern, responsive UI
+- 🔍 **Type Safety**: Strict TypeScript throughout
+- 🗺️ **Mappers**: Clear separation between API, Domain, and View layers
+- ♿ **Accessibility**: ARIA labels and semantic HTML
+
 ## Key Features
 
 - ✅ Product listing with pagination

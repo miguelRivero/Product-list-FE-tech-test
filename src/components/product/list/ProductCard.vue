@@ -9,6 +9,7 @@
           loading="lazy"
           @error="handleImageError"
         />
+        <!-- ✅ Performance: loading="lazy" defers offscreen images, improving initial page load -->
         <Tag
           :value="product.category"
           severity="info"
@@ -59,6 +60,7 @@
             outlined
             class="action-button"
             data-testid="view-button"
+            aria-label="View product details"
             @click="$emit('view', product.id)"
           />
           <Button
@@ -68,6 +70,7 @@
             outlined
             class="action-button"
             data-testid="edit-button"
+            aria-label="Edit product"
             @click="$emit('edit', product.id)"
           />
           <Button
@@ -78,6 +81,7 @@
             outlined
             class="action-button"
             data-testid="delete-button"
+            aria-label="Delete product"
             @click="$emit('delete', product)"
           />
         </div>
