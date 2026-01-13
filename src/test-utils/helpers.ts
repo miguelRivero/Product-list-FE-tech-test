@@ -15,7 +15,7 @@ export function mountWithStubs<T extends Component>(
         // PrimeVue components - stub them for simpler tests
         InputText: {
           template:
-            '<input :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+            '<input :data-testid="$attrs[\'data-testid\']" :value="modelValue" :placeholder="placeholder" @input="$emit(\'update:modelValue\', $event.target.value)" />',
           props: ["modelValue", "placeholder"],
           emits: ["update:modelValue"],
         },
@@ -45,13 +45,13 @@ export function mountWithStubs<T extends Component>(
         },
         Button: {
           template:
-            '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+            '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled || loading" @click="$emit(\'click\')">{{ label || "" }}<slot /></button>',
           props: ["label", "disabled", "loading"],
           emits: ["click"],
         },
         Dialog: {
           template:
-            '<div v-if="visible" data-testid="$attrs[\'data-testid\']"><slot /><slot name="footer" /></div>',
+            '<div v-if="visible" :data-testid="$attrs[\'data-testid\']"><slot /><slot name="footer" /></div>',
           props: ["visible"],
         },
         Message: {

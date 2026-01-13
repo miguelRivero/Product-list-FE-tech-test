@@ -61,6 +61,9 @@ vi.mock("@/utils/apiCache", () => ({
   },
 }));
 
+// Note: productStoreHelpers don't need mocking since they only use
+// already-mocked dependencies (logger, apiCache)
+
 // Mock ID generator
 vi.mock("@/utils/idGenerator", () => ({
   generateSecureClientId: vi.fn(() => 15000),

@@ -2,13 +2,18 @@ import type { Product as DomainProduct } from "@/domain/product/Product";
 import type { Product as ApiProduct } from "@/types/product";
 
 /**
- * Adapter to convert domain Product entities to API Product type
- * This allows components to continue working with the existing Product type
- * while the store uses domain entities internally
+ * ProductViewModelMapper
+ * Presentation layer mapper for converting Domain entities to View Models
+ *
+ * This mapper prepares domain Product entities for consumption by the View layer.
+ * It converts domain entities to the API Product type that components expect.
+ *
+ * **Architectural Pattern: ViewModel (MVVM)**
+ * - Domain entities are transformed into ViewModels suitable for UI components
+ * - Separates domain concerns from presentation concerns
+ * - Allows components to work with a stable API type while domain evolves
  */
-export function domainProductToApiProduct(
-  domainProduct: DomainProduct
-): ApiProduct {
+export function toProductViewModel(domainProduct: DomainProduct): ApiProduct {
   const dto = domainProduct.toDTO();
 
   return {

@@ -9,9 +9,13 @@ import {
 import { apiCache } from "@/utils/apiCache";
 import { defineStore } from "pinia";
 import { diContainer } from "@/infrastructure/di/container";
-import { domainProductToApiProduct } from "./productsAdapter";
+import { toProductViewModel } from "./ProductViewModelMapper";
 import { logger } from "@/utils/logger";
 import { productsApi } from "@/services/api";
+import {
+  handleProductError,
+  invalidateProductCaches,
+} from "./helpers/productStoreHelpers";
 
 export const useProductsStore = defineStore("products", () => {
   // State (using API Product type for component compatibility)
@@ -52,22 +56,15 @@ export const useProductsStore = defineStore("products", () => {
       );
 
       // Convert domain entities to API Product type for component compatibility
-      products.value = result.products.map(domainProductToApiProduct);
+      products.value = result.products.map(toProductViewModel);
       total.value = result.total;
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch products";
-      error.value = errorMessage;
-      logger.error(
-        "Error fetching products",
-        err instanceof Error ? err : new Error(errorMessage),
-        {
-          page,
-          limit,
-          searchQuery: searchQuery.value,
-          category: selectedCategory.value,
-        }
-      );
+      error.value = handleProductError(err, "fetching products", {
+        page,
+        limit,
+        searchQuery: searchQuery.value,
+        category: selectedCategory.value,
+      });
     } finally {
       loading.value = false;
     }
@@ -91,20 +88,13 @@ export const useProductsStore = defineStore("products", () => {
       } else {
         const getProductUseCase = diContainer.getProductUseCase();
         const domainProduct = await getProductUseCase.execute(id);
-        const apiProduct = domainProductToApiProduct(domainProduct);
+        const apiProduct = toProductViewModel(domainProduct);
         selectedProduct.value = apiProduct;
         // Cache for 10 minutes
         apiCache.set(cacheKey, apiProduct, undefined, CACHE_TTL.PRODUCT_DETAIL);
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch product";
-      error.value = errorMessage;
-      logger.error(
-        "Error fetching product",
-        err instanceof Error ? err : new Error(errorMessage),
-        { id }
-      );
+      error.value = handleProductError(err, "fetching product", { id });
     } finally {
       loading.value = false;
     }
@@ -177,7 +167,7 @@ export const useProductsStore = defineStore("products", () => {
       );
 
       // Convert to API Product type
-      const newProduct = domainProductToApiProduct(domainProduct);
+      const newProduct = toProductViewModel(domainProduct);
 
       // Add placeholder image if needed (handled in use case, but ensure it's set)
       if (!newProduct.thumbnail) {
@@ -193,8 +183,8 @@ export const useProductsStore = defineStore("products", () => {
       products.value.unshift(newProduct);
       total.value += 1;
 
-      // Invalidate product list cache
-      apiCache.invalidatePattern("^/products");
+      // Invalidate product caches
+      invalidateProductCaches();
 
       logger.info("Product created successfully", {
         id: clientId,
@@ -203,16 +193,9 @@ export const useProductsStore = defineStore("products", () => {
 
       return newProduct;
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to create product";
-      error.value = errorMessage;
-      logger.error(
-        "Error creating product",
-        err instanceof Error ? err : new Error(errorMessage),
-        {
-          productData,
-        }
-      );
+      error.value = handleProductError(err, "creating product", {
+        productData,
+      });
       throw err;
     } finally {
       loading.value = false;
@@ -277,7 +260,7 @@ export const useProductsStore = defineStore("products", () => {
       const domainProduct = await updateProductUseCase.execute(id, updates);
 
       // Convert to API Product type
-      const updatedProduct = domainProductToApiProduct(domainProduct);
+      const updatedProduct = toProductViewModel(domainProduct);
 
       // Update state with the actual updated product
       if (productIndex !== -1) {
@@ -288,8 +271,7 @@ export const useProductsStore = defineStore("products", () => {
       }
 
       // Invalidate caches
-      apiCache.invalidate(`/products/${id}`);
-      apiCache.invalidatePattern("^/products");
+      invalidateProductCaches(id);
 
       logger.info("Product updated successfully", { id, updates });
 
@@ -302,17 +284,10 @@ export const useProductsStore = defineStore("products", () => {
       if (selectedProduct.value?.id === id && originalProduct) {
         selectedProduct.value = originalProduct;
       }
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to update product";
-      error.value = errorMessage;
-      logger.error(
-        "Error updating product",
-        err instanceof Error ? err : new Error(errorMessage),
-        {
-          id,
-          updates,
-        }
-      );
+      error.value = handleProductError(err, "updating product", {
+        id,
+        updates,
+      });
       throw err;
     } finally {
       loading.value = false;
@@ -359,8 +334,7 @@ export const useProductsStore = defineStore("products", () => {
       await deleteProductUseCase.execute(id);
 
       // Invalidate caches
-      apiCache.invalidate(`/products/${id}`);
-      apiCache.invalidatePattern("^/products");
+      invalidateProductCaches(id);
 
       logger.info("Product deleted successfully", { id });
     } catch (err) {
@@ -371,14 +345,7 @@ export const useProductsStore = defineStore("products", () => {
       } else if (productInSelected) {
         total.value += 1;
       }
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete product";
-      error.value = errorMessage;
-      logger.error(
-        "Error deleting product",
-        err instanceof Error ? err : new Error(errorMessage),
-        { id }
-      );
+      error.value = handleProductError(err, "deleting product", { id });
       throw err;
     } finally {
       loading.value = false;
