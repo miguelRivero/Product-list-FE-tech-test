@@ -1,6 +1,7 @@
 import { ref, watch } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+
 import { SEARCH_DEBOUNCE_DELAY } from "@/utils/constants";
+import { useDebounceFn } from "@vueuse/core";
 
 /**
  * Composable for search functionality with debouncing

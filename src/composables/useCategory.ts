@@ -1,4 +1,5 @@
-import type { Ref, ComputedRef } from "vue";
+import type { ComputedRef, Ref } from "vue";
+
 import type { Category } from "@/types/product";
 
 /**

@@ -1,5 +1,5 @@
-import { ref } from "vue";
 import type { ProductFormData } from "@/types/product";
+import { ref } from "vue";
 
 /**
  * Composable for dialog management
@@ -37,12 +37,6 @@ export function useDialog() {
     success.value = null;
   };
 
-  const handleDialogClose = (visible: boolean) => {
-    if (!visible) {
-      close();
-    }
-  };
-
   return {
     isVisible,
     formData,
@@ -53,6 +47,5 @@ export function useDialog() {
     setError,
     setSuccess,
     clearMessages,
-    handleDialogClose,
   };
 }

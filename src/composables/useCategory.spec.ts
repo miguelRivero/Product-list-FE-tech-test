@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { Category } from "@/types/product";
 import { ref } from "vue";
 import { useCategory } from "./useCategory";
-import type { Category } from "@/types/product";
 
 describe("useCategory", () => {
   const mockCategories = ref<Category[]>([
