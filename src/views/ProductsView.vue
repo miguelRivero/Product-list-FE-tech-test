@@ -71,19 +71,8 @@ import {
 const store = useProductsStore();
 
 // Extract reactive state and getters
-const {
-  products,
-  total,
-  loading,
-  error,
-  categories,
-  currentPage,
-  pageSize,
-  selectedCategory,
-  totalPages,
-  hasNextPage,
-  hasPrevPage,
-} = storeToRefs(store);
+const { products, total, loading, error, categories, currentPage, pageSize } =
+  storeToRefs(store);
 
 // Actions are accessed directly from the store
 const {

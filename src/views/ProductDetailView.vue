@@ -99,20 +99,10 @@ const router = useRouter();
 const store = useProductsStore();
 
 // Extract reactive state and getters
-const {
-  selectedProduct,
-  loading,
-  error,
-  categories,
-} = storeToRefs(store);
+const { selectedProduct, loading, error, categories } = storeToRefs(store);
 
 // Actions are accessed directly from the store
-const {
-  fetchProduct,
-  deleteProduct,
-  updateProduct,
-  fetchCategories,
-} = store;
+const { fetchProduct, deleteProduct, updateProduct, fetchCategories } = store;
 
 const product = selectedProduct;
 const showEditDialog = ref(false);
