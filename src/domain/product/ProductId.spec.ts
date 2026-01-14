@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { ProductId } from "./ProductId";
-import { InvalidProductIdError } from "./errors";
+import { describe, expect, it } from "vitest";
+
 import { CLIENT_ID_RANGE } from "@/utils/constants";
+import { InvalidProductIdError } from "./errors";
+import { ProductId } from "./ProductId";
 
 describe("ProductId", () => {
   describe("create", () => {

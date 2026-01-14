@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { Price } from "./Price";
+import { describe, expect, it } from "vitest";
+
 import { InvalidPriceError } from "./errors";
+import { Price } from "./Price";
 
 describe("Price", () => {
   describe("create", () => {

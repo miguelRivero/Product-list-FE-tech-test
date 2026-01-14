@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { ProductTitle } from "./ProductTitle";
+import { describe, expect, it } from "vitest";
+
 import { InvalidProductTitleError } from "./errors";
+import { ProductTitle } from "./ProductTitle";
 
 describe("ProductTitle", () => {
   describe("create", () => {
@@ -15,10 +16,10 @@ describe("ProductTitle", () => {
       expect(title.getValue()).toBe(longTitle);
     });
 
-    it("trims whitespace but preserves value", () => {
-      const title = ProductTitle.create("  Test Product  ");
-      // Value should be trimmed internally for validation, but getValue returns original
-      expect(title.getValue()).toBe("  Test Product  ");
+    it("normalizes whitespace by trimming and collapsing multiple spaces", () => {
+      const title = ProductTitle.create("  Test   Product  ");
+      // Whitespace is normalized: trimmed and multiple spaces collapsed to single space
+      expect(title.getValue()).toBe("Test Product");
     });
 
     it("throws error for empty string", () => {
@@ -68,10 +69,16 @@ describe("ProductTitle", () => {
       expect(title1.equals(title2)).toBe(false);
     });
 
-    it("returns false for titles with different whitespace", () => {
+    it("returns true for titles with different whitespace (normalized)", () => {
       const title1 = ProductTitle.create("Test Product");
-      const title2 = ProductTitle.create("Test  Product"); // Different whitespace
-      expect(title1.equals(title2)).toBe(false);
+      const title2 = ProductTitle.create("Test  Product"); // Different whitespace, but normalized
+      expect(title1.equals(title2)).toBe(true);
+    });
+
+    it("normalizes leading and trailing whitespace", () => {
+      const title1 = ProductTitle.create("  Test Product  ");
+      const title2 = ProductTitle.create("Test Product");
+      expect(title1.equals(title2)).toBe(true);
     });
   });
 

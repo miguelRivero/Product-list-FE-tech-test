@@ -6,19 +6,21 @@ import { InvalidProductTitleError } from "./errors";
  */
 export class ProductTitle {
   private constructor(private readonly value: string) {
-    const trimmed = value.trim();
-    if (trimmed.length === 0) {
+    // Value is already normalized in create(), so we can validate directly
+    if (value.length === 0) {
       throw new InvalidProductTitleError("Product title cannot be empty");
     }
-    if (trimmed.length > 200) {
+    if (value.length > 200) {
       throw new InvalidProductTitleError(
-        `Product title cannot exceed 200 characters, got: ${trimmed.length}`
+        `Product title cannot exceed 200 characters, got: ${value.length}`
       );
     }
   }
 
   static create(value: string): ProductTitle {
-    return new ProductTitle(value);
+    // Normalize whitespace: trim and replace multiple spaces with single space
+    const normalized = value.trim().replace(/\s+/g, " ");
+    return new ProductTitle(normalized);
   }
 
   getValue(): string {

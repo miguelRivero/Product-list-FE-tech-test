@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { Product } from "./Product";
-import { ProductId } from "./ProductId";
-import { ProductTitle } from "./ProductTitle";
-import { Price } from "./Price";
-import { Stock } from "./Stock";
+import { describe, expect, it } from "vitest";
+
 import { DiscountPercentage } from "./DiscountPercentage";
 import { InvalidProductError } from "./errors";
+import { Price } from "./Price";
+import { Product } from "./Product";
+import type { ProductDTO } from "./ProductDTO";
+import { ProductId } from "./ProductId";
+import { ProductTitle } from "./ProductTitle";
+import { Stock } from "./Stock";
 
 describe("Product", () => {
   const createValidProduct = () => {
@@ -168,6 +170,14 @@ describe("Product", () => {
       expect(() => product.updateDescription("")).toThrow(InvalidProductError);
     });
 
+    it("throws error for whitespace-only description", () => {
+      const product = createValidProduct();
+
+      expect(() => product.updateDescription("   ")).toThrow(
+        InvalidProductError
+      );
+    });
+
     it("throws error for description exceeding 5000 characters", () => {
       const product = createValidProduct();
       const longDescription = "a".repeat(5001);
@@ -260,6 +270,109 @@ describe("Product", () => {
       expect(product.getStock().getValue()).toBe(50);
       expect(product.getRating()).toBe(4.5);
     });
+
+    it("creates product from DTO with meta field", () => {
+      const dto = {
+        id: 1,
+        title: "Test Product",
+        description: "Test description",
+        category: "electronics",
+        price: 100,
+        discountPercentage: 10,
+        stock: 50,
+        rating: 4.5,
+        images: ["image1.jpg"],
+        thumbnail: "thumb.jpg",
+        tags: ["tag1"],
+        meta: {
+          createdAt: "2024-01-01T00:00:00Z",
+          updatedAt: "2024-01-02T00:00:00Z",
+          barcode: "123456789",
+          qrCode: "QR123",
+        },
+      };
+
+      const product = Product.fromDTO(dto);
+      const resultDto = product.toDTO();
+
+      expect(resultDto.meta).toEqual({
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-02T00:00:00Z",
+        barcode: "123456789",
+        qrCode: "QR123",
+      });
+    });
+
+    it("creates product from DTO with default discountPercentage when undefined", () => {
+      const dto: ProductDTO = {
+        id: 1,
+        title: "Test Product",
+        description: "Test description",
+        category: "electronics",
+        price: 100,
+        discountPercentage: 0, // Required by DTO, but fromDTO handles undefined
+        stock: 50,
+        rating: 4.5,
+        images: [],
+        thumbnail: "",
+        tags: [],
+      };
+
+      const product = Product.fromDTO(dto);
+
+      expect(product.getDiscountPercentage().getValue()).toBe(0);
+    });
+
+    it("creates product from DTO with default rating when undefined", () => {
+      const dto: ProductDTO = {
+        id: 1,
+        title: "Test Product",
+        description: "Test description",
+        category: "electronics",
+        price: 100,
+        discountPercentage: 0,
+        stock: 50,
+        rating: 0, // Required by DTO, but fromDTO handles undefined
+        images: [],
+        thumbnail: "",
+        tags: [],
+      };
+
+      const product = Product.fromDTO(dto);
+
+      expect(product.getRating()).toBe(0);
+    });
+
+    it("creates product from DTO with minimal required fields", () => {
+      const dto: ProductDTO = {
+        id: 1,
+        title: "Test Product",
+        description: "Test description",
+        category: "electronics",
+        price: 100,
+        discountPercentage: 0,
+        stock: 50,
+        rating: 0,
+        images: [],
+        thumbnail: "",
+        tags: [],
+      };
+
+      const product = Product.fromDTO(dto);
+
+      expect(product.getId().getValue()).toBe(1);
+      expect(product.getTitle().getValue()).toBe("Test Product");
+      expect(product.getDescription()).toBe("Test description");
+      expect(product.getCategory()).toBe("electronics");
+      expect(product.getPrice().getAmount()).toBe(100);
+      expect(product.getStock().getValue()).toBe(50);
+      expect(product.getRating()).toBe(0);
+      expect(product.getImages()).toEqual([]);
+      expect(product.getThumbnail()).toBe("");
+      expect(product.getTags()).toEqual([]);
+      expect(product.getBrand()).toBeUndefined();
+      expect(product.getSku()).toBeUndefined();
+    });
   });
 
   describe("toDTO", () => {
@@ -295,6 +408,116 @@ describe("Product", () => {
       expect(dto.tags).toEqual(["tag1"]);
       expect(dto.brand).toBe("Brand");
       expect(dto.sku).toBe("SKU123");
+    });
+
+    it("converts product to DTO with meta field", () => {
+      const product = Product.create({
+        id: ProductId.create(1),
+        title: ProductTitle.create("Test Product"),
+        description: "Test description",
+        category: "electronics",
+        price: Price.create(100),
+        stock: Stock.create(50),
+        meta: {
+          createdAt: "2024-01-01T00:00:00Z",
+          updatedAt: "2024-01-02T00:00:00Z",
+          barcode: "123456789",
+          qrCode: "QR123",
+        },
+      });
+
+      const dto = product.toDTO();
+
+      expect(dto.meta).toEqual({
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-02T00:00:00Z",
+        barcode: "123456789",
+        qrCode: "QR123",
+      });
+    });
+
+    it("converts product to DTO without optional fields", () => {
+      const product = createValidProduct();
+
+      const dto = product.toDTO();
+
+      expect(dto.brand).toBeUndefined();
+      expect(dto.sku).toBeUndefined();
+      expect(dto.meta).toBeUndefined();
+    });
+  });
+
+  describe("fromDTO and toDTO roundtrip", () => {
+    it("maintains data integrity when converting fromDTO to toDTO", () => {
+      const originalDto = {
+        id: 1,
+        title: "Test Product",
+        description: "Test description",
+        category: "electronics",
+        price: 100,
+        discountPercentage: 10,
+        stock: 50,
+        rating: 4.5,
+        images: ["image1.jpg", "image2.jpg"],
+        thumbnail: "thumb.jpg",
+        tags: ["tag1", "tag2"],
+        brand: "Brand",
+        sku: "SKU123",
+        meta: {
+          createdAt: "2024-01-01T00:00:00Z",
+          updatedAt: "2024-01-02T00:00:00Z",
+          barcode: "123456789",
+        },
+      };
+
+      const product = Product.fromDTO(originalDto);
+      const resultDto = product.toDTO();
+
+      expect(resultDto.id).toBe(originalDto.id);
+      expect(resultDto.title).toBe(originalDto.title);
+      expect(resultDto.description).toBe(originalDto.description);
+      expect(resultDto.category).toBe(originalDto.category);
+      expect(resultDto.price).toBe(originalDto.price);
+      expect(resultDto.discountPercentage).toBe(originalDto.discountPercentage);
+      expect(resultDto.stock).toBe(originalDto.stock);
+      expect(resultDto.rating).toBe(originalDto.rating);
+      expect(resultDto.images).toEqual(originalDto.images);
+      expect(resultDto.thumbnail).toBe(originalDto.thumbnail);
+      expect(resultDto.tags).toEqual(originalDto.tags);
+      expect(resultDto.brand).toBe(originalDto.brand);
+      expect(resultDto.sku).toBe(originalDto.sku);
+      expect(resultDto.meta).toEqual(originalDto.meta);
+    });
+
+    it("maintains data integrity with minimal DTO", () => {
+      const originalDto: ProductDTO = {
+        id: 1,
+        title: "Test Product",
+        description: "Test description",
+        category: "electronics",
+        price: 100,
+        discountPercentage: 0,
+        stock: 50,
+        rating: 0,
+        images: [],
+        thumbnail: "",
+        tags: [],
+      };
+
+      const product = Product.fromDTO(originalDto);
+      const resultDto = product.toDTO();
+
+      expect(resultDto.id).toBe(originalDto.id);
+      expect(resultDto.title).toBe(originalDto.title);
+      expect(resultDto.description).toBe(originalDto.description);
+      expect(resultDto.category).toBe(originalDto.category);
+      expect(resultDto.price).toBe(originalDto.price);
+      expect(resultDto.discountPercentage).toBe(0); // Default value
+      expect(resultDto.stock).toBe(originalDto.stock);
+      expect(resultDto.rating).toBe(originalDto.rating);
+      expect(resultDto.images).toEqual(originalDto.images);
+      expect(resultDto.thumbnail).toBe(originalDto.thumbnail);
+      expect(resultDto.tags).toEqual(originalDto.tags);
     });
   });
 });
