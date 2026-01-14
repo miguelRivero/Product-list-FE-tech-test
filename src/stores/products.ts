@@ -10,6 +10,7 @@ import {
   invalidateProductCaches,
 } from "./helpers/productStoreHelpers";
 
+import { ProductNotFoundError } from "@/domain/product/errors";
 import { apiCache } from "@/utils/apiCache";
 import { defineStore } from "pinia";
 import { diContainer } from "@/infrastructure/di/container";
@@ -349,23 +350,28 @@ export const useProductsStore = defineStore("products", () => {
     } catch (err) {
       // If product doesn't exist on server but exists locally (DummyJSON doesn't persist),
       // treat it as a successful deletion since we already removed it from UI optimistically
-      if (
-        err instanceof Error &&
-        err.message.includes("not found") &&
-        (productInList || productInSelected)
-      ) {
+      const isNotFoundError =
+        err instanceof ProductNotFoundError ||
+        (err instanceof Error &&
+          (err.message.includes("not found") ||
+            err.message.includes("Not found") ||
+            err.name === "ProductNotFoundError"));
+
+      if (isNotFoundError && (productInList || productInSelected)) {
         // Product was already removed from UI optimistically
         // Since DummyJSON doesn't persist, this is expected behavior
+        // Don't log as error, just info since this is expected behavior
         logger.info(
           "Product deleted successfully (not found on server, removed locally)",
           {
             id,
           }
         );
+        // Don't throw error - treat as success since product was removed from UI
         return;
       }
 
-      // Restore on error
+      // Restore on error (only for real errors, not "not found" cases)
       if (productIndex !== -1 && productInList) {
         products.value.splice(productIndex, 0, productInList);
         total.value += 1;
