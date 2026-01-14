@@ -493,4 +493,63 @@ describe("Products Store", () => {
     expect(store.products.length).toBe(1);
     expect(store.total).toBe(1);
   });
+
+  it("deletes client-created product without calling use case", async () => {
+    const store = useProductsStore();
+
+    const clientProduct: Product = {
+      id: CLIENT_ID_RANGE.MIN + 1, // Client-generated ID
+      title: "Client Product",
+      description: "Description",
+      category: "electronics",
+      price: 100,
+      discountPercentage: 0,
+      rating: 0,
+      stock: 50,
+      images: [],
+      thumbnail: "",
+    };
+
+    store.products = [clientProduct];
+    store.total = 1;
+
+    await store.deleteProduct(clientProduct.id);
+
+    expect(store.products.length).toBe(0);
+    expect(store.total).toBe(0);
+    expect(mockDeleteProductUseCase.execute).not.toHaveBeenCalled();
+  });
+
+  it("treats 'not found' error as success when product exists locally", async () => {
+    const store = useProductsStore();
+
+    const product: Product = {
+      id: 1,
+      title: "Product",
+      description: "Description",
+      category: "electronics",
+      price: 100,
+      discountPercentage: 0,
+      rating: 0,
+      stock: 50,
+      images: [],
+      thumbnail: "",
+    };
+
+    store.products = [product];
+    store.total = 1;
+
+    // Simulate "not found" error (product exists locally but not on server)
+    mockDeleteProductUseCase.execute.mockRejectedValue(
+      new Error("Product with ID 1 not found")
+    );
+
+    await store.deleteProduct(1);
+
+    // Product should be removed from UI (optimistic update succeeded)
+    expect(store.products.length).toBe(0);
+    expect(store.total).toBe(0);
+    // Should not throw error
+    expect(store.error).toBeNull();
+  });
 });

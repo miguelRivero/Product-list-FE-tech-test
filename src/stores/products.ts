@@ -313,6 +313,9 @@ export const useProductsStore = defineStore("products", () => {
       throw new Error("Product not found");
     }
 
+    // Check if product is client-side created
+    const isClientCreated = isClientGeneratedId(id);
+
     // Optimistic update - remove from UI immediately
     const productIndex = products.value.findIndex(p => p.id === id);
     if (productIndex !== -1) {
@@ -327,6 +330,13 @@ export const useProductsStore = defineStore("products", () => {
       selectedProduct.value = null;
     }
 
+    if (isClientCreated) {
+      // Product was created locally, just remove from UI without API call
+      loading.value = false;
+      logger.info("Product deleted successfully (client-created)", { id });
+      return;
+    }
+
     try {
       // Use case handles domain logic
       const deleteProductUseCase = diContainer.getDeleteProductUseCase();
@@ -337,6 +347,24 @@ export const useProductsStore = defineStore("products", () => {
 
       logger.info("Product deleted successfully", { id });
     } catch (err) {
+      // If product doesn't exist on server but exists locally (DummyJSON doesn't persist),
+      // treat it as a successful deletion since we already removed it from UI optimistically
+      if (
+        err instanceof Error &&
+        err.message.includes("not found") &&
+        (productInList || productInSelected)
+      ) {
+        // Product was already removed from UI optimistically
+        // Since DummyJSON doesn't persist, this is expected behavior
+        logger.info(
+          "Product deleted successfully (not found on server, removed locally)",
+          {
+            id,
+          }
+        );
+        return;
+      }
+
       // Restore on error
       if (productIndex !== -1 && productInList) {
         products.value.splice(productIndex, 0, productInList);
