@@ -1,6 +1,6 @@
+import type { Product as ApiProduct } from "@/types/product";
 import type { ProductDTO as DomainProductDTO } from "@/domain/product/ProductDTO";
 import type { Product } from "@/domain/product/Product";
-import type { Product as ApiProduct } from "@/types/product";
 import { Product as ProductEntity } from "@/domain/product/Product";
 import type { ProductFormData } from "@/types/product";
 
@@ -16,6 +16,12 @@ import type { ProductFormData } from "@/types/product";
 export class ProductMapper {
   /**
    * Converts an API Product response to a Domain Product entity
+   *
+   * Note: Some fields from the API (weight, dimensions, warrantyInformation,
+   * shippingInformation, availabilityStatus, reviews, returnPolicy, minimumOrderQuantity)
+   * are included in ProductDTO but are not stored in the Product entity.
+   * These fields will be lost during conversion to Domain entity.
+   *
    * @param apiProduct - Product from API response
    * @returns Domain Product entity
    */
@@ -27,6 +33,11 @@ export class ProductMapper {
   /**
    * Converts a Domain Product entity to an API Product payload
    * Used for POST/PUT requests to the API
+   *
+   * Note: Some fields (weight, dimensions, warrantyInformation, etc.) may be
+   * undefined in the output because they are not stored in the Product entity,
+   * even though they exist in ProductDTO.
+   *
    * @param product - Domain Product entity
    * @returns API Product payload
    */

@@ -8,7 +8,24 @@ import { UpdateProductUseCase } from "@/application/use-cases/UpdateProductUseCa
 
 /**
  * Dependency Injection Container
- * Simple container for managing dependencies
+ *
+ * Centralizes dependency creation and lifecycle management following DDD principles.
+ * This container serves as the composition root, wiring together domain, application,
+ * and infrastructure layers.
+ *
+ * Key responsibilities:
+ * - Manages singleton instances (e.g., ProductRepository) to ensure consistent state
+ * - Creates use case instances with proper dependencies injected
+ * - Provides a single point of control for swapping implementations (e.g., mocks in tests)
+ *
+ * Benefits:
+ * - Decoupling: Application layer (stores) doesn't know about concrete implementations
+ * - Testability: Easy to mock the container in tests (see stores/products.spec.ts)
+ * - Maintainability: Change repository implementation in one place
+ * - Consistency: All use cases share the same repository instance
+ *
+ * Usage: Stores import `diContainer` and call methods like `diContainer.getProductsUseCase()`
+ * instead of manually instantiating use cases with `new CreateProductUseCase(new ProductRepositoryImpl())`
  */
 class DIContainer {
   private productRepository: ProductRepository | null = null;
