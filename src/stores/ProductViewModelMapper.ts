@@ -1,5 +1,5 @@
-import type { Product as DomainProduct } from "@/domain/product/Product";
 import type { Product as ApiProduct } from "@/types/product";
+import type { Product as DomainProduct } from "@/domain/product/Product";
 
 /**
  * ProductViewModelMapper

@@ -5,17 +5,17 @@ import {
   generateSecureClientId,
   isClientGeneratedId,
 } from "@/utils/idGenerator";
-
-import { apiCache } from "@/utils/apiCache";
-import { defineStore } from "pinia";
-import { diContainer } from "@/infrastructure/di/container";
-import { toProductViewModel } from "./ProductViewModelMapper";
-import { logger } from "@/utils/logger";
-import { productsApi } from "@/services/api";
 import {
   handleProductError,
   invalidateProductCaches,
 } from "./helpers/productStoreHelpers";
+
+import { apiCache } from "@/utils/apiCache";
+import { defineStore } from "pinia";
+import { diContainer } from "@/infrastructure/di/container";
+import { logger } from "@/utils/logger";
+import { productsApi } from "@/services/api";
+import { toProductViewModel } from "./ProductViewModelMapper";
 
 export const useProductsStore = defineStore("products", () => {
   // State (using API Product type for component compatibility)
@@ -255,7 +255,6 @@ export const useProductsStore = defineStore("products", () => {
 
     try {
       // Use case handles domain logic
-      // Línea 272-273
       const updateProductUseCase = diContainer.getUpdateProductUseCase();
       const domainProduct = await updateProductUseCase.execute(id, updates);
 

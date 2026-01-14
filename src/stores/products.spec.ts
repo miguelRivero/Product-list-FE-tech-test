@@ -1,5 +1,9 @@
+import {
+  CLIENT_ID_RANGE,
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+} from "@/utils/constants";
 import type { Category, Product } from "@/types/product";
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/utils/constants";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 
@@ -61,9 +65,6 @@ vi.mock("@/utils/apiCache", () => ({
   },
 }));
 
-// Note: productStoreHelpers don't need mocking since they only use
-// already-mocked dependencies (logger, apiCache)
-
 // Mock ID generator
 vi.mock("@/utils/idGenerator", () => ({
   generateSecureClientId: vi.fn(() => 15000),
@@ -119,7 +120,6 @@ describe("Products Store", () => {
   it("computes totalPages correctly", async () => {
     const store = useProductsStore();
 
-    // Mock use case response
     mockGetProductsUseCase.execute.mockResolvedValue({
       products: [],
       total: 25,
@@ -162,10 +162,8 @@ describe("Products Store", () => {
       },
     ];
 
-    // Convert to domain entities
     const domainProducts = mockApiProducts.map(createDomainProductFromApiData);
 
-    // Mock use case response
     mockGetProductsUseCase.execute.mockResolvedValue({
       products: domainProducts,
       total: 2,
@@ -298,7 +296,6 @@ describe("Products Store", () => {
   it("resets store state", () => {
     const store = useProductsStore();
 
-    // Set some state
     store.products = [
       {
         id: 1,
@@ -352,8 +349,8 @@ describe("Products Store", () => {
 
     const result = await store.createProduct(mockProductData);
 
-    expect(result.id).toBeGreaterThanOrEqual(10000);
-    expect(result.id).toBeLessThan(100000);
+    expect(result.id).toBeGreaterThanOrEqual(CLIENT_ID_RANGE.MIN);
+    expect(result.id).toBeLessThan(CLIENT_ID_RANGE.MAX + 1);
     expect(store.products.length).toBe(1);
     expect(store.products[0].title).toBe("New Product");
     expect(store.total).toBe(1);
@@ -422,7 +419,6 @@ describe("Products Store", () => {
     const result = await store.updateProduct(15000, updates);
 
     expect(result.title).toBe("Updated");
-    // Use case is NOT called for client-created products (optimistic update only)
     expect(mockUpdateProductUseCase.execute).not.toHaveBeenCalled();
     expect(store.products[0].title).toBe("Updated");
   });
