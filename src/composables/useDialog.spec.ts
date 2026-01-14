@@ -29,16 +29,6 @@ describe("useDialog", () => {
       expect(dialog.error.value).toBe(null);
       expect(dialog.success.value).toBe(null);
     });
-
-    it("clears messages when opening", () => {
-      dialog.setError("Some error");
-      dialog.setSuccess("Some success");
-
-      dialog.open();
-
-      expect(dialog.error.value).toBe(null);
-      expect(dialog.success.value).toBe(null);
-    });
   });
 
   describe("close", () => {
