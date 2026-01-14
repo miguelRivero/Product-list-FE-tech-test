@@ -86,25 +86,33 @@ import ProductDetailNavigation from "@/components/product/detail/ProductDetailNa
 import ProductDetailContent from "@/components/product/detail/ProductDetailContent.vue";
 import ProductForm from "@/components/product/form/ProductForm.vue";
 import DeleteConfirmationDialog from "@/components/product/form/DeleteConfirmationDialog.vue";
-import { useProducts } from "@/composables/useProducts";
 import { useDialog } from "@/composables/useDialog";
 import { useCategory } from "@/composables/useCategory";
+import { useProductsStore } from "@/stores/products";
+import { storeToRefs } from "pinia";
 import type { ProductFormData } from "@/types/product";
 import { DIALOG_AUTO_CLOSE_DELAY } from "@/utils/constants";
 
 const route = useRoute();
 const router = useRouter();
 
+const store = useProductsStore();
+
+// Extract reactive state and getters
 const {
   selectedProduct,
   loading,
   error,
   categories,
+} = storeToRefs(store);
+
+// Actions are accessed directly from the store
+const {
   fetchProduct,
   deleteProduct,
   updateProduct,
   fetchCategories,
-} = useProducts();
+} = store;
 
 const product = selectedProduct;
 const showEditDialog = ref(false);

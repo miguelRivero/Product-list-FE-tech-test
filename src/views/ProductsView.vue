@@ -56,11 +56,11 @@ import ProductsToolbar from "@/components/product/list/ProductsToolbar.vue";
 import ProductsContent from "@/components/product/list/ProductsContent.vue";
 import ProductListFooter from "@/components/product/list/ProductListFooter.vue";
 import DeleteConfirmationDialog from "@/components/product/form/DeleteConfirmationDialog.vue";
-import { useProducts } from "@/composables/useProducts";
 import { useSearch } from "@/composables/useSearch";
 import { useCategory } from "@/composables/useCategory";
 import { useProductActions } from "@/composables/useProductActions";
 import { useProductsStore } from "@/stores/products";
+import { storeToRefs } from "pinia";
 import type { Product, ProductFormData } from "@/types/product";
 import {
   DIALOG_AUTO_CLOSE_DELAY,
@@ -70,6 +70,7 @@ import {
 
 const store = useProductsStore();
 
+// Extract reactive state and getters
 const {
   products,
   total,
@@ -78,6 +79,14 @@ const {
   categories,
   currentPage,
   pageSize,
+  selectedCategory,
+  totalPages,
+  hasNextPage,
+  hasPrevPage,
+} = storeToRefs(store);
+
+// Actions are accessed directly from the store
+const {
   fetchProducts,
   fetchCategories,
   setSelectedCategory,
@@ -85,12 +94,13 @@ const {
   deleteProduct,
   createProduct,
   updateProduct,
-} = useProducts();
+} = store;
 
 const clearError = () => {
   store.error = null;
 };
 
+// useSearch manages its own searchQuery ref and syncs with store
 const { searchQuery } = useSearch((query: string) => {
   setSearchQuery(query);
 });
