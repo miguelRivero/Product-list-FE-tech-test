@@ -30,14 +30,9 @@ export function toProductViewModel(domainProduct: DomainProduct): ApiProduct {
     tags: dto.tags,
     brand: dto.brand,
     sku: dto.sku,
-    weight: dto.weight,
-    dimensions: dto.dimensions,
-    warrantyInformation: dto.warrantyInformation,
-    shippingInformation: dto.shippingInformation,
-    availabilityStatus: dto.availabilityStatus,
-    reviews: dto.reviews,
-    returnPolicy: dto.returnPolicy,
-    minimumOrderQuantity: dto.minimumOrderQuantity,
+    // Note: weight, dimensions, warrantyInformation, shippingInformation,
+    // availabilityStatus, reviews, returnPolicy, minimumOrderQuantity are not
+    // stored in Product entity, so they're not included in the DTO
     meta: dto.meta,
   };
 }
