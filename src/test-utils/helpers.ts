@@ -1,5 +1,7 @@
 import { mount, type MountingOptions } from "@vue/test-utils";
 import type { Component } from "vue";
+import { vi } from "vitest";
+import type { ProductRepository } from "@/domain/product/ProductRepository";
 
 /**
  * Helper function to mount Vue components with PrimeVue stubs
@@ -79,4 +81,21 @@ export function mountWithStubs<T extends Component>(
     },
     ...options,
   });
+}
+
+/**
+ * Creates a mock ProductRepository with all methods mocked
+ * Useful for testing use cases without a real repository implementation
+ */
+export function createMockProductRepository(): ProductRepository {
+  return {
+    findAll: vi.fn(),
+    findById: vi.fn(),
+    findByCategory: vi.fn(),
+    search: vi.fn(),
+    save: vi.fn(),
+    delete: vi.fn(),
+    exists: vi.fn(),
+    existsByTitle: vi.fn(),
+  };
 }

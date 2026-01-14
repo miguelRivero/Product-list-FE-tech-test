@@ -10,25 +10,15 @@ import { ProductId } from "@/domain/product/ProductId";
 import type { ProductRepository } from "@/domain/product/ProductRepository";
 import { ProductTitle } from "@/domain/product/ProductTitle";
 import { Stock } from "@/domain/product/Stock";
+import { createMockProductRepository } from "@/test-utils/helpers";
 
 describe("CreateProductUseCase", () => {
   let mockRepository: ProductRepository;
-  let useCase: CreateProductUseCase;
+  let createUseCase: CreateProductUseCase;
 
   beforeEach(() => {
-    // Create mock repository
-    mockRepository = {
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      findByCategory: vi.fn(),
-      search: vi.fn(),
-      save: vi.fn(),
-      delete: vi.fn(),
-      exists: vi.fn(),
-      existsByTitle: vi.fn(),
-    };
-
-    useCase = new CreateProductUseCase(mockRepository);
+    mockRepository = createMockProductRepository();
+    createUseCase = new CreateProductUseCase(mockRepository);
   });
 
   const createMockProductFormData = (
@@ -64,7 +54,7 @@ describe("CreateProductUseCase", () => {
     vi.mocked(mockRepository.existsByTitle).mockResolvedValue(false);
     vi.mocked(mockRepository.save).mockResolvedValue(mockSavedProduct);
 
-    const result = await useCase.execute(formData, clientId);
+    const result = await createUseCase.execute(formData, clientId);
 
     expect(mockRepository.existsByTitle).toHaveBeenCalledWith(formData.title);
     expect(mockRepository.save).toHaveBeenCalledWith(expect.any(Product));
@@ -77,7 +67,7 @@ describe("CreateProductUseCase", () => {
 
     vi.mocked(mockRepository.existsByTitle).mockResolvedValue(true);
 
-    await expect(useCase.execute(formData, clientId)).rejects.toThrow(
+    await expect(createUseCase.execute(formData, clientId)).rejects.toThrow(
       DuplicateProductTitleError
     );
 
@@ -103,7 +93,7 @@ describe("CreateProductUseCase", () => {
     vi.mocked(mockRepository.existsByTitle).mockResolvedValue(false);
     vi.mocked(mockRepository.save).mockResolvedValue(mockSavedProduct);
 
-    const result = await useCase.execute(formData, clientId);
+    const result = await createUseCase.execute(formData, clientId);
 
     expect(result).toBe(mockSavedProduct);
   });
@@ -124,7 +114,7 @@ describe("CreateProductUseCase", () => {
     vi.mocked(mockRepository.existsByTitle).mockResolvedValue(false);
     vi.mocked(mockRepository.save).mockResolvedValue(mockSavedProduct);
 
-    const result = await useCase.execute(formData, clientId);
+    const result = await createUseCase.execute(formData, clientId);
 
     expect(result).toBe(mockSavedProduct);
   });

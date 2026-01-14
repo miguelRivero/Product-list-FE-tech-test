@@ -9,24 +9,15 @@ import { Stock } from "@/domain/product/Stock";
 import { DiscountPercentage } from "@/domain/product/DiscountPercentage";
 import { ProductNotFoundError } from "@/domain/product/errors";
 import type { ProductFormData } from "@/types/product";
+import { createMockProductRepository } from "@/test-utils/helpers";
 
 describe("UpdateProductUseCase", () => {
   let mockRepository: ProductRepository;
-  let useCase: UpdateProductUseCase;
+  let updateUseCase: UpdateProductUseCase;
 
   beforeEach(() => {
-    // Create mock repository
-    mockRepository = {
-      findAll: vi.fn(),
-      findById: vi.fn(),
-      findByCategory: vi.fn(),
-      search: vi.fn(),
-      save: vi.fn(),
-      delete: vi.fn(),
-      exists: vi.fn(),
-    };
-
-    useCase = new UpdateProductUseCase(mockRepository);
+    mockRepository = createMockProductRepository();
+    updateUseCase = new UpdateProductUseCase(mockRepository);
   });
 
   const createMockProduct = (): Product => {
@@ -55,7 +46,7 @@ describe("UpdateProductUseCase", () => {
     vi.mocked(mockRepository.findById).mockResolvedValue(existingProduct);
     vi.mocked(mockRepository.save).mockResolvedValue(updatedProduct);
 
-    const result = await useCase.execute(productId, updates);
+    const result = await updateUseCase.execute(productId, updates);
 
     expect(mockRepository.findById).toHaveBeenCalledWith(
       ProductId.create(productId)
@@ -72,7 +63,7 @@ describe("UpdateProductUseCase", () => {
 
     vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
-    await expect(useCase.execute(productId, updates)).rejects.toThrow(
+    await expect(updateUseCase.execute(productId, updates)).rejects.toThrow(
       ProductNotFoundError
     );
 
@@ -104,7 +95,7 @@ describe("UpdateProductUseCase", () => {
     vi.mocked(mockRepository.findById).mockResolvedValue(existingProduct);
     vi.mocked(mockRepository.save).mockResolvedValue(updatedProduct);
 
-    const result = await useCase.execute(productId, updates);
+    const result = await updateUseCase.execute(productId, updates);
 
     expect(mockRepository.save).toHaveBeenCalled();
     expect(result).toBe(updatedProduct);
@@ -123,7 +114,7 @@ describe("UpdateProductUseCase", () => {
     vi.mocked(mockRepository.findById).mockResolvedValue(existingProduct);
     vi.mocked(mockRepository.save).mockResolvedValue(updatedProduct);
 
-    const result = await useCase.execute(productId, updates);
+    const result = await updateUseCase.execute(productId, updates);
 
     expect(mockRepository.save).toHaveBeenCalled();
     expect(result).toBe(updatedProduct);
@@ -138,7 +129,7 @@ describe("UpdateProductUseCase", () => {
     vi.mocked(mockRepository.findById).mockResolvedValue(existingProduct);
     vi.mocked(mockRepository.save).mockResolvedValue(existingProduct);
 
-    const result = await useCase.execute(productId, updates);
+    const result = await updateUseCase.execute(productId, updates);
 
     expect(mockRepository.save).toHaveBeenCalled();
     expect(result).toBe(existingProduct);
