@@ -42,7 +42,6 @@ defineEmits<{
   align-items: center;
   justify-content: space-between;
 }
-
 .back-link {
   display: flex;
   align-items: center;
