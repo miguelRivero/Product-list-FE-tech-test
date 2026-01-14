@@ -9,7 +9,7 @@
         placeholder="Search products..."
         class="search-input w-full pl-7 pr-4 py-3 text-base rounded-lg border shadow-none"
         data-testid="search-input"
-        @update:model-value="$emit('update:searchQuery', $event)"
+        @update:model-value="$emit('update:searchQuery', $event ?? '')"
       />
     </div>
   </div>

@@ -3,6 +3,7 @@ import "./style.css";
 import "primeicons/primeicons.css";
 
 import App from "./App.vue";
+// @ts-expect-error - @primevue/themes@4.5.4 doesn't export Aura as default correctly
 import Aura from "@primevue/themes/aura";
 import ConfirmationService from "primevue/confirmationservice";
 import PrimeVue from "primevue/config";
