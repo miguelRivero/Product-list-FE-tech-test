@@ -27,7 +27,7 @@
     },
 
     /* Vue support */
-    "types": ["vite/client"]
+    "types": ["vite/client", "vue/ref-macros"]
   },
   "include": [
     "src/**/*.ts",

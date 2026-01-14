@@ -9,3 +9,10 @@ declare module "*.vue" {
   >;
   export default component;
 }
+
+// Vue template JSX support
+declare namespace JSX {
+  interface IntrinsicElements {
+    [elem: string]: unknown;
+  }
+}
