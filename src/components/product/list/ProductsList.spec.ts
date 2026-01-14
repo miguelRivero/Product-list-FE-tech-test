@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
+import type { Category, Product } from "@/types/product";
+import { describe, expect, it } from "vitest";
+
+import type { MountingOptions } from "@vue/test-utils";
 import ProductsList from "./ProductsList.vue";
-import type { Product, Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<InstanceType<typeof ProductsList>>;
 
 describe("ProductsList", () => {
   const mockCategories: Category[] = [
@@ -34,7 +38,7 @@ describe("ProductsList", () => {
         products,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="products-table"]').exists()).toBe(true);
   });
@@ -46,7 +50,7 @@ describe("ProductsList", () => {
         products,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const rows = wrapper.findAll('[data-testid="product-row"]');
     expect(rows.length).toBe(3);
@@ -59,7 +63,7 @@ describe("ProductsList", () => {
         products,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.text()).toContain("Product 1");
     expect(wrapper.text()).toContain("$99.99");
@@ -73,12 +77,11 @@ describe("ProductsList", () => {
         products,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const viewButton = wrapper.find('[data-testid="view-button"]');
     await viewButton.trigger("click");
 
-    expect(wrapper.emitted("view")).toBeTruthy();
     expect(wrapper.emitted("view")?.[0]).toEqual([1]);
   });
 
@@ -89,12 +92,11 @@ describe("ProductsList", () => {
         products,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const editButton = wrapper.find('[data-testid="edit-button"]');
     await editButton.trigger("click");
 
-    expect(wrapper.emitted("edit")).toBeTruthy();
     expect(wrapper.emitted("edit")?.[0]).toEqual([1]);
   });
 
@@ -105,22 +107,21 @@ describe("ProductsList", () => {
         products,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const deleteButton = wrapper.find('[data-testid="delete-button"]');
     await deleteButton.trigger("click");
 
-    expect(wrapper.emitted("delete")).toBeTruthy();
     expect(wrapper.emitted("delete")?.[0]).toEqual([products[0]]);
   });
 
   it("handles empty products array", () => {
     const wrapper = mountWithStubs(ProductsList, {
       props: {
-        products: [],
+        products: [] as Product[],
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const rows = wrapper.findAll('[data-testid="product-row"]');
     expect(rows.length).toBe(0);

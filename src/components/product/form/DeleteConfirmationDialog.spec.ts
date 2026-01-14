@@ -101,7 +101,6 @@ describe("DeleteConfirmationDialog", () => {
     if (cancelButton) {
       await cancelButton.trigger("click");
       expect(wrapper.emitted("cancel")).toBeTruthy();
-      expect(wrapper.emitted("update:visible")).toBeTruthy();
       expect(wrapper.emitted("update:visible")?.[0]).toEqual([false]);
     }
   });

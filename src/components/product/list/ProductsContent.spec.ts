@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
+import type { Category, Product } from "@/types/product";
+import { describe, expect, it } from "vitest";
+
+import type { MountingOptions } from "@vue/test-utils";
 import ProductsContent from "./ProductsContent.vue";
-import type { Product, Category } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<InstanceType<typeof ProductsContent>>;
 
 describe("ProductsContent", () => {
   const mockCategories: Category[] = [
@@ -37,7 +41,7 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     // ProductsLoadingState should be rendered
     expect(wrapper.html()).toContain("Loading");
@@ -53,7 +57,7 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.text()).toContain("Something went wrong");
   });
@@ -68,7 +72,7 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="products-table"]').exists()).toBe(true);
   });
@@ -83,7 +87,7 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.text()).toContain("No products found");
   });
@@ -98,7 +102,7 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="product-create-dialog"]').exists()).toBe(
       true
@@ -115,7 +119,7 @@ describe("ProductsContent", () => {
         editingProduct: mockProducts[0],
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="product-edit-dialog"]').exists()).toBe(
       true
@@ -132,12 +136,11 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     // Trigger view event from ProductsList component
     await wrapper.vm.$emit("view", 1);
 
-    expect(wrapper.emitted("view")).toBeTruthy();
     expect(wrapper.emitted("view")?.[0]).toEqual([1]);
   });
 
@@ -151,7 +154,7 @@ describe("ProductsContent", () => {
         editingProduct: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     // Trigger close event from ProductsErrorState
     await wrapper.vm.$emit("clear-error");

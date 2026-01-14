@@ -25,10 +25,3 @@ const end = computed(() => {
   return calculatedEnd > props.total ? props.total : calculatedEnd;
 });
 </script>
-
-<style scoped lang="scss">
-.products-list-info {
-  .info-text {
-  }
-}
-</style>

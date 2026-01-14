@@ -1,7 +1,13 @@
-import { describe, it, expect } from "vitest";
-import ProductCategoriesSelect from "./ProductCategoriesSelect.vue";
+import { describe, expect, it } from "vitest";
+
 import type { Category } from "@/types/product";
+import type { MountingOptions } from "@vue/test-utils";
+import ProductCategoriesSelect from "./ProductCategoriesSelect.vue";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<
+  InstanceType<typeof ProductCategoriesSelect>
+>;
 
 describe("ProductCategoriesSelect", () => {
   const mockCategories: Category[] = [
@@ -19,7 +25,7 @@ describe("ProductCategoriesSelect", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="category-select"]').exists()).toBe(true);
   });
@@ -30,7 +36,7 @@ describe("ProductCategoriesSelect", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     // The component includes an "All" option with slug: null
     const select = wrapper.find('[data-testid="category-select"]');
@@ -43,12 +49,11 @@ describe("ProductCategoriesSelect", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const select = wrapper.find('[data-testid="category-select"]');
     await select.setValue("electronics");
 
-    expect(wrapper.emitted("update:selectedCategory")).toBeTruthy();
     expect(wrapper.emitted("update:selectedCategory")?.[0]).toEqual([
       "electronics",
     ]);
@@ -60,7 +65,7 @@ describe("ProductCategoriesSelect", () => {
         selectedCategory: "electronics",
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const select = wrapper.find('[data-testid="category-select"]');
     expect((select.element as HTMLSelectElement).value).toBe("electronics");
@@ -72,7 +77,7 @@ describe("ProductCategoriesSelect", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const select = wrapper.find('[data-testid="category-select"]');
     expect(select.attributes("aria-label")).toBe("Filter products by category");

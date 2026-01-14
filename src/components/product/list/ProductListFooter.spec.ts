@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import type { MountingOptions } from "@vue/test-utils";
 import ProductListFooter from "./ProductListFooter.vue";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<InstanceType<typeof ProductListFooter>>;
 
 describe("ProductListFooter", () => {
   it("renders pagination and info components", () => {
@@ -10,10 +14,12 @@ describe("ProductListFooter", () => {
         pageSize: 10,
         total: 100,
       },
-    });
+    } as MountOptions);
 
     // Both ProductsListInfo and ProductsPagination should be rendered
-    expect(wrapper.html()).toBeDefined();
+    // Verify by checking for their CSS classes
+    expect(wrapper.find(".product-list-info").exists()).toBe(true);
+    expect(wrapper.find('[data-testid="pagination"]').exists()).toBe(true);
   });
 
   it("emits page-change event when pagination changes", async () => {
@@ -23,12 +29,11 @@ describe("ProductListFooter", () => {
         pageSize: 10,
         total: 100,
       },
-    });
+    } as MountOptions);
 
     // Simulate page change from ProductsPagination
     await wrapper.vm.$emit("page-change", { page: 1, first: 10, rows: 10 });
 
-    expect(wrapper.emitted("page-change")).toBeTruthy();
     expect(wrapper.emitted("page-change")?.[0]).toEqual([
       { page: 1, first: 10, rows: 10 },
     ]);
@@ -41,7 +46,7 @@ describe("ProductListFooter", () => {
         pageSize: 20,
         total: 150,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.props("currentPage")).toBe(2);
     expect(wrapper.props("pageSize")).toBe(20);

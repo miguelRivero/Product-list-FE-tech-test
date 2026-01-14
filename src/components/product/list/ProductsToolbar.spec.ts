@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
-import ProductsToolbar from "./ProductsToolbar.vue";
+import { describe, expect, it } from "vitest";
+
 import type { Category } from "@/types/product";
+import type { MountingOptions } from "@vue/test-utils";
+import ProductsToolbar from "./ProductsToolbar.vue";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<InstanceType<typeof ProductsToolbar>>;
 
 describe("ProductsToolbar", () => {
   const mockCategories: Category[] = [
@@ -19,7 +23,7 @@ describe("ProductsToolbar", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="category-select"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="add-product-button"]').exists()).toBe(
@@ -33,7 +37,7 @@ describe("ProductsToolbar", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const addButton = wrapper.find('[data-testid="add-product-button"]');
     await addButton.trigger("click");
@@ -47,7 +51,7 @@ describe("ProductsToolbar", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     // Simulate category selection
     await wrapper.vm.$emit("update:selectedCategory", "electronics");
@@ -61,7 +65,7 @@ describe("ProductsToolbar", () => {
         selectedCategory: null,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     const addButton = wrapper.find('[data-testid="add-product-button"]');
     expect(addButton.attributes("aria-label")).toBe("Add new product");

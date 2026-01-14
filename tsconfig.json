@@ -35,5 +35,8 @@
     "src/**/*.vue",
     "src/vite-env.d.ts"
   ],
+  "vueCompilerOptions": {
+    "target": 3
+  },
   "references": [{ "path": "./tsconfig.node.json" }]
 }

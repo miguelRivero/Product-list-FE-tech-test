@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { mount } from "@vue/test-utils";
-import ProductListActions from "./ProductListActions.vue";
+import { describe, expect, it } from "vitest";
+
 import type { Product } from "@/types/product";
+import ProductListActions from "./ProductListActions.vue";
+import { mount } from "@vue/test-utils";
 
 describe("ProductListActions", () => {
   const createMockProduct = (): Product => ({
@@ -40,7 +41,6 @@ describe("ProductListActions", () => {
 
     await wrapper.find('[data-testid="view-button"]').trigger("click");
 
-    expect(wrapper.emitted("view")).toBeTruthy();
     expect(wrapper.emitted("view")?.[0]).toEqual([1]);
   });
 
@@ -54,7 +54,6 @@ describe("ProductListActions", () => {
 
     await wrapper.find('[data-testid="edit-button"]').trigger("click");
 
-    expect(wrapper.emitted("edit")).toBeTruthy();
     expect(wrapper.emitted("edit")?.[0]).toEqual([1]);
   });
 
@@ -69,7 +68,6 @@ describe("ProductListActions", () => {
 
     await wrapper.find('[data-testid="delete-button"]').trigger("click");
 
-    expect(wrapper.emitted("delete")).toBeTruthy();
     expect(wrapper.emitted("delete")?.[0]).toEqual([mockProduct]);
   });
 
