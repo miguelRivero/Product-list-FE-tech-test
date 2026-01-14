@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog.vue";
+import type { MountingOptions } from "@vue/test-utils";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<
+  InstanceType<typeof DeleteConfirmationDialog>
+>;
 
 describe("DeleteConfirmationDialog", () => {
   const defaultProps = {
@@ -13,7 +18,7 @@ describe("DeleteConfirmationDialog", () => {
   it("renders dialog when visible is true", () => {
     const wrapper = mountWithStubs(DeleteConfirmationDialog, {
       props: defaultProps,
-    });
+    } as MountOptions);
 
     expect(
       wrapper.find('[data-testid="delete-confirmation-dialog"]').exists()
@@ -26,7 +31,7 @@ describe("DeleteConfirmationDialog", () => {
         ...defaultProps,
         visible: false,
       },
-    });
+    } as MountOptions);
 
     expect(
       wrapper.find('[data-testid="delete-confirmation-dialog"]').exists()
@@ -39,7 +44,7 @@ describe("DeleteConfirmationDialog", () => {
         ...defaultProps,
         productTitle: "My Test Product",
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.text()).toContain("My Test Product");
     expect(wrapper.text()).toContain("Are you sure you want to delete");
@@ -51,7 +56,7 @@ describe("DeleteConfirmationDialog", () => {
         ...defaultProps,
         errorMessage: "Failed to delete product",
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.text()).toContain("Failed to delete product");
   });
@@ -62,7 +67,7 @@ describe("DeleteConfirmationDialog", () => {
         ...defaultProps,
         successMessage: "Product deleted successfully",
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.text()).toContain("Product deleted successfully");
   });
@@ -70,7 +75,7 @@ describe("DeleteConfirmationDialog", () => {
   it("emits confirm event when delete button is clicked", async () => {
     const wrapper = mountWithStubs(DeleteConfirmationDialog, {
       props: defaultProps,
-    });
+    } as MountOptions);
 
     // Find delete button by text content
     const buttons = wrapper.findAll("button");
@@ -86,7 +91,7 @@ describe("DeleteConfirmationDialog", () => {
   it("emits cancel and update:visible events when cancel button is clicked", async () => {
     const wrapper = mountWithStubs(DeleteConfirmationDialog, {
       props: defaultProps,
-    });
+    } as MountOptions);
 
     // Find cancel button by text content
     const buttons = wrapper.findAll("button");
@@ -107,7 +112,7 @@ describe("DeleteConfirmationDialog", () => {
         ...defaultProps,
         isDeleting: true,
       },
-    });
+    } as MountOptions);
 
     const buttons = wrapper.findAll("button");
     const deleteButton = buttons.find(btn => btn.text().includes("Delete"));

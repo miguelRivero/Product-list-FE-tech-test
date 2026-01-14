@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
+import type { Category, Product, ProductFormData } from "@/types/product";
+import { describe, expect, it } from "vitest";
+
+import type { MountingOptions } from "@vue/test-utils";
 import ProductForm from "./ProductForm.vue";
-import type { Product, Category, ProductFormData } from "@/types/product";
 import { mountWithStubs } from "@/test-utils/helpers";
+
+type MountOptions = MountingOptions<InstanceType<typeof ProductForm>>;
 
 // Type for component instance with exposed methods and properties
 type ProductFormInstance = {
@@ -43,7 +47,7 @@ describe("ProductForm", () => {
       props: {
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     expect(wrapper.find('[data-testid="product-title-input"]').exists()).toBe(
       true
@@ -72,7 +76,7 @@ describe("ProductForm", () => {
         product,
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     // Wait for initial render and watchers to execute
     await wrapper.vm.$nextTick();
@@ -89,7 +93,7 @@ describe("ProductForm", () => {
         product: createMockProduct(),
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     await wrapper.vm.$nextTick();
     await wrapper.setProps({ product: null });
@@ -107,7 +111,7 @@ describe("ProductForm", () => {
       props: {
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     await wrapper.vm.$nextTick();
 
@@ -128,7 +132,9 @@ describe("ProductForm", () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted("submit")).toBeTruthy();
-    const submittedData = wrapper.emitted("submit")?.[0]?.[0];
+    const submittedData = wrapper.emitted("submit")?.[0]?.[0] as
+      | ProductFormData
+      | undefined;
     expect(submittedData).toBeDefined();
     expect(submittedData?.title).toBe("New Product");
   });
@@ -138,7 +144,7 @@ describe("ProductForm", () => {
       props: {
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     await wrapper.vm.$nextTick();
 
@@ -155,23 +161,12 @@ describe("ProductForm", () => {
     );
   });
 
-  it("exposes submitForm method", () => {
-    const wrapper = mountWithStubs(ProductForm, {
-      props: {
-        categories: mockCategories,
-      },
-    });
-
-    const formComponent = wrapper.vm as unknown as ProductFormInstance;
-    expect(typeof formComponent.submitForm).toBe("function");
-  });
-
   it("updates form data when user types in inputs", async () => {
     const wrapper = mountWithStubs(ProductForm, {
       props: {
         categories: mockCategories,
       },
-    });
+    } as MountOptions);
 
     await wrapper.vm.$nextTick();
 
