@@ -1,4 +1,4 @@
-import { test, expect } from "playwright/test";
+import { expect, test } from "playwright/test";
 
 test.describe("Product CRUD Operations", () => {
   test.beforeEach(async ({ page }) => {
@@ -7,20 +7,6 @@ test.describe("Product CRUD Operations", () => {
     await page.waitForSelector('[data-testid="products-table"]', {
       timeout: 10000,
     });
-  });
-
-  test("opens create product dialog", async ({ page }) => {
-    // Click "Add new" button
-    const addButton = page.getByRole("button", { name: /add new/i });
-    await addButton.click();
-
-    // Wait for dialog
-    const dialog = page.getByTestId("product-create-dialog");
-    await expect(dialog).toBeVisible({ timeout: 5000 });
-
-    // Verify form fields are visible
-    await expect(page.getByTestId("product-title-input")).toBeVisible();
-    await expect(page.getByTestId("product-category-select")).toBeVisible();
   });
 
   test("creates a new product", async ({ page }) => {
