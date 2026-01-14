@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { validateProductForm, sanitizeString } from "./validation";
+import { describe, expect, it } from "vitest";
+import { sanitizeString, validateProductForm } from "./validation";
 
 describe("validateProductForm", () => {
   it("validates correct product form data", () => {
