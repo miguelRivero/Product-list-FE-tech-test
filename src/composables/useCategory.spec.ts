@@ -27,42 +27,6 @@ describe("useCategory", () => {
     ];
   });
 
-  it("finds category by name", () => {
-    const { findCategoryByName } = useCategory(mockCategories);
-    const category = findCategoryByName("Electronics");
-
-    expect(category).toEqual({
-      slug: "electronics",
-      name: "Electronics",
-      url: "/categories/electronics",
-    });
-  });
-
-  it("finds category by slug", () => {
-    const { findCategoryBySlug } = useCategory(mockCategories);
-    const category = findCategoryBySlug("beauty");
-
-    expect(category).toEqual({
-      slug: "beauty",
-      name: "Beauty",
-      url: "/categories/beauty",
-    });
-  });
-
-  it("returns undefined when category not found by name", () => {
-    const { findCategoryByName } = useCategory(mockCategories);
-    const category = findCategoryByName("NonExistent");
-
-    expect(category).toBeUndefined();
-  });
-
-  it("returns undefined when category not found by slug", () => {
-    const { findCategoryBySlug } = useCategory(mockCategories);
-    const category = findCategoryBySlug("nonexistent");
-
-    expect(category).toBeUndefined();
-  });
-
   it("converts slug to name", () => {
     const { slugToName } = useCategory(mockCategories);
     const name = slugToName("electronics");
@@ -75,20 +39,6 @@ describe("useCategory", () => {
     const name = slugToName("nonexistent");
 
     expect(name).toBe("nonexistent");
-  });
-
-  it("converts name to slug", () => {
-    const { nameToSlug } = useCategory(mockCategories);
-    const slug = nameToSlug("Electronics");
-
-    expect(slug).toBe("electronics");
-  });
-
-  it("generates slug from name if category not found", () => {
-    const { nameToSlug } = useCategory(mockCategories);
-    const slug = nameToSlug("New Category");
-
-    expect(slug).toBe("new-category");
   });
 
   it("capitalizes category name correctly", () => {

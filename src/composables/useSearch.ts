@@ -1,9 +1,6 @@
 import { ref, watch } from "vue";
 import { useDebounceFn } from "@vueuse/core";
-import {
-  SEARCH_DEBOUNCE_DELAY,
-  SEARCH_STATE_RESET_DELAY,
-} from "@/utils/constants";
+import { SEARCH_DEBOUNCE_DELAY } from "@/utils/constants";
 
 /**
  * Composable for search functionality with debouncing
@@ -16,16 +13,10 @@ export function useSearch(
   delay = SEARCH_DEBOUNCE_DELAY
 ) {
   const searchQuery = ref("");
-  const isSearching = ref(false);
 
   // Debounced search function using VueUse
   const debouncedSearch = useDebounceFn((query: string) => {
-    isSearching.value = true;
     onSearch(query);
-    // Reset searching state after a short delay
-    setTimeout(() => {
-      isSearching.value = false;
-    }, SEARCH_STATE_RESET_DELAY);
   }, delay);
 
   // Watch for search query changes
@@ -33,7 +24,6 @@ export function useSearch(
     if (newQuery.trim() === "") {
       // Clear search immediately if query is empty
       onSearch("");
-      isSearching.value = false;
     } else {
       debouncedSearch(newQuery);
     }
@@ -41,6 +31,5 @@ export function useSearch(
 
   return {
     searchQuery,
-    isSearching,
   };
 }
